@@ -56,6 +56,13 @@ public final class LoginRegisterPanel extends JPanel {
                     boolean loggedIn = databaseHandler.checkLogin(email, password);
                     if (loggedIn) {
                         JOptionPane.showMessageDialog(null, "Inicio de sesión exitoso");
+                        // Cerrar la ventana actual
+                        Window window = SwingUtilities.getWindowAncestor(LoginRegisterPanel.this);
+                        window.dispose();
+
+                        // Abrir la nueva ventana con los 4 botones
+                        MenuWindow menuWindow = new MenuWindow();
+                        menuWindow.setVisible(true);
                     } else {
                         JOptionPane.showMessageDialog(null, "Credenciales incorrectas");
                     }
