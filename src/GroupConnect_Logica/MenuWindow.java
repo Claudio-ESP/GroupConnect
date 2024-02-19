@@ -16,12 +16,17 @@ public class MenuWindow extends JFrame {
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 // Carga la imagen de fondo desde la ruta relativa
-                ImageIcon backgroundImage = new ImageIcon("Images/fondo.png");
+                ImageIcon backgroundImage = new ImageIcon("Images/imagenFiesta.png");
                 g.drawImage(backgroundImage.getImage(), 0, 0, getWidth(), getHeight(), this);
             }
         };
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
         setContentPane(contentPane);
+
+        // Creamos un panel para los botones
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+        buttonPanel.setOpaque(false);
 
         // Creamos los botones
         JButton joinGroupButton = new JButton("Unirse a grupo");
@@ -29,13 +34,18 @@ public class MenuWindow extends JFrame {
         JButton activitiesButton = new JButton("Actividades");
         JButton myGroupButton = new JButton("Mi grupo");
 
-        // Añadimos los botones al panel
-        contentPane.add(Box.createVerticalGlue());
-        contentPane.add(joinGroupButton);
-        contentPane.add(createGroupButton);
-        contentPane.add(activitiesButton);
-        contentPane.add(myGroupButton);
-        contentPane.add(Box.createVerticalGlue());
+        // Añadimos un espacio fijo a la izquierda y a la derecha del panel de botones
+        buttonPanel.add(Box.createVerticalStrut(50)); // Espacio al principio
+        buttonPanel.add(joinGroupButton);
+        buttonPanel.add(createGroupButton);
+        buttonPanel.add(activitiesButton);
+        buttonPanel.add(myGroupButton);
+        buttonPanel.add(Box.createVerticalStrut(50)); // Espacio al final
+
+        // Añadimos el panel de botones al contenido principal
+        contentPane.add(Box.createHorizontalStrut(130)); // Espacio a la izquierda
+        contentPane.add(buttonPanel);
+        contentPane.add(Box.createHorizontalStrut(130)); // Espacio a la derecha
 
         // Centramos la ventana en la pantalla
         setLocationRelativeTo(null);
