@@ -15,17 +15,20 @@ public final class LoginRegisterPanel extends JPanel {
     public LoginRegisterPanel(DatabaseHandler databaseHandler) {
         this.databaseHandler = databaseHandler;
 
-        setLayout(new BorderLayout());
+        // Creamos un JLayeredPane en lugar de usar BorderLayout
+        JLayeredPane layeredPane = new JLayeredPane();
+        layeredPane.setPreferredSize(new Dimension(800, 400));
 
         // Carga la imagen de fondo desde la ruta relativa
-        ImageIcon backgroundImageIcon = new ImageIcon("Images/inicio(1).png");
+        ImageIcon backgroundImageIcon = new ImageIcon("Images/imagen.png");
         JLabel backgroundLabel = new JLabel(backgroundImageIcon);
-        add(backgroundLabel, BorderLayout.CENTER);
+        backgroundLabel.setBounds(0, 0, backgroundImageIcon.getIconWidth(), backgroundImageIcon.getIconHeight());
 
         // Panel secundario para los campos de entrada y botones
         JPanel fieldsPanel = new JPanel();
         fieldsPanel.setLayout(new GridLayout(0, 2, 10, 10));
         fieldsPanel.setOpaque(false); // Hace que el panel sea transparente
+        fieldsPanel.setBounds(0, 0, 800, 400);
 
         JLabel emailLabel = new JLabel("Correo:");
         fieldsPanel.add(emailLabel);
@@ -41,9 +44,6 @@ public final class LoginRegisterPanel extends JPanel {
         fieldsPanel.add(nameLabel);
         nameField = new JTextField();
         fieldsPanel.add(nameField);
-
-        // Agrega el panel secundario al panel principal
-        add(fieldsPanel, BorderLayout.SOUTH);
 
         // Botones
         JButton loginButton = new JButton("Iniciar sesión");
@@ -86,13 +86,19 @@ public final class LoginRegisterPanel extends JPanel {
         // Agrega los botones al panel secundario
         fieldsPanel.add(loginButton);
         fieldsPanel.add(registerButton);
+
+        // Añadir componentes al JLayeredPane
+        layeredPane.add(backgroundLabel, JLayeredPane.DEFAULT_LAYER);
+        layeredPane.add(fieldsPanel, JLayeredPane.PALETTE_LAYER);
+
+        add(layeredPane); // Agrega el JLayeredPane al panel principal
     }
 
     public static void main(String[] args) {
         DatabaseHandler databaseHandler = new DatabaseHandler();
         JFrame frame = new JFrame("Iniciar Sesion/Registrarse");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(400, 200);
+        frame.setSize(850, 450);
         frame.getContentPane().add(new LoginRegisterPanel(databaseHandler));
         frame.setVisible(true);
     }
