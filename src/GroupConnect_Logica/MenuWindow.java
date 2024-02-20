@@ -2,6 +2,8 @@ package GroupConnect_Logica;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class MenuWindow extends JFrame {
 
@@ -46,6 +48,22 @@ public class MenuWindow extends JFrame {
         contentPane.add(Box.createHorizontalStrut(130)); // Espacio a la izquierda
         contentPane.add(buttonPanel);
         contentPane.add(Box.createHorizontalStrut(130)); // Espacio a la derecha
+
+        // Asociamos la acción de crear grupo al botón correspondiente
+        createGroupButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new CrearGrupoAction().actionPerformed(e);
+            }
+        });
+
+        // Asociamos la acción de unirse a grupo al botón correspondiente
+        joinGroupButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new UnirseGrupoAction().actionPerformed(e);
+            }
+        });
 
         // Centramos la ventana en la pantalla
         setLocationRelativeTo(null);
