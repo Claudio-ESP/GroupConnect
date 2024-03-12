@@ -20,20 +20,28 @@ public class UnirseGrupoAction implements ActionListener {
         String nombreGrupo = buscarNombreGrupo(codigoGrupo);
 
         if (nombreGrupo != null) {
-            // Guardar los datos en la base de datos
-            try {
-                Connection connection = getConnection();
-                String sql = "INSERT INTO participantes (nombreGrupo, participante) VALUES (?, ?)";
-                PreparedStatement statement = connection.prepareStatement(sql);
-                statement.setString(1, codigoGrupo); // Aquí se guarda el código del grupo como nombreGrupo
-                statement.setString(2, nombrePersona); // El nombre de la persona que se une
-                statement.executeUpdate();
-                JOptionPane.showMessageDialog(null, "Te has unido al grupo: " + nombreGrupo);
-                statement.close();
-                connection.close();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-                JOptionPane.showMessageDialog(null, "Error al unirse al grupo");
+            // Obtener el id_usuario
+            int idUsuario = obtenerIdUsuario(nombrePersona);
+
+            if (idUsuario != -1) {
+                // Guardar los datos en la base de datos
+                try {
+                    Connection connection = getConnection();
+                    String sql = "INSERT INTO participantes (id_usuario, nombreGrupo, participante) VALUES (?, ?, ?)";
+                    PreparedStatement statement = connection.prepareStatement(sql);
+                    statement.setInt(1, idUsuario); // Aquí se guarda el id_usuario
+                    statement.setString(2, nombreGrupo); // El nombre del grupo
+                    statement.setString(3, nombrePersona); // El nombre de la persona que se une
+                    statement.executeUpdate();
+                    JOptionPane.showMessageDialog(null, "Te has unido al grupo: " + nombreGrupo);
+                    statement.close();
+                    connection.close();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(null, "Error al unirse al grupo");
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "Usuario no encontrado");
             }
         } else {
             JOptionPane.showMessageDialog(null, "Código de grupo no encontrado");
@@ -59,6 +67,27 @@ public class UnirseGrupoAction implements ActionListener {
             ex.printStackTrace();
         }
         return nombreGrupo;
+    }
+
+    // Método para obtener el id_usuario basado en el nombre de la persona
+    private int obtenerIdUsuario(String nombrePersona) {
+        int idUsuario = -1;
+        try {
+            Connection connection = getConnection();
+            String sql = "SELECT id FROM users WHERE name = ?";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, nombrePersona);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                idUsuario = resultSet.getInt("id");
+            }
+            resultSet.close();
+            statement.close();
+            connection.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return idUsuario;
     }
 
     // Método para obtener una conexión a la base de datos

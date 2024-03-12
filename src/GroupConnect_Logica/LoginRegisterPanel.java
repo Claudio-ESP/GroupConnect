@@ -40,11 +40,6 @@ public final class LoginRegisterPanel extends JPanel {
         passwordField = new JPasswordField();
         fieldsPanel.add(passwordField);
 
-        JLabel nameLabel = new JLabel("Nombre:");
-        fieldsPanel.add(nameLabel);
-        nameField = new JTextField();
-        fieldsPanel.add(nameField);
-
         // Botones
         JButton loginButton = new JButton("Iniciar sesión");
         loginButton.addActionListener(new ActionListener() {
@@ -52,23 +47,30 @@ public final class LoginRegisterPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 String email = emailField.getText();
                 String password = new String(passwordField.getPassword());
-                try {
-                    boolean loggedIn = databaseHandler.checkLogin(email, password);
-                    if (loggedIn) {
-                        JOptionPane.showMessageDialog(null, "Inicio de sesión exitoso");
-                        // Cerrar la ventana actual
-                        Window window = SwingUtilities.getWindowAncestor(LoginRegisterPanel.this);
-                        window.dispose();
 
-                        // Abrir la nueva ventana con los 4 botones
-                        MenuWindow menuWindow = new MenuWindow();
-                        menuWindow.setVisible(true);
-                    } else {
-                        JOptionPane.showMessageDialog(null, "Credenciales incorrectas");
+                // Verifica si alguno de los campos está vacío
+                if (email.isEmpty() || password.isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Por favor, complete todos los campos");
+                } else {
+                    try {
+                        // Verifica las credenciales
+                        boolean loggedIn = databaseHandler.checkLogin(email, password);
+                        if (loggedIn) {
+                            JOptionPane.showMessageDialog(null, "Inicio de sesión exitoso");
+                            // Cerrar la ventana actual
+                            Window window = SwingUtilities.getWindowAncestor(LoginRegisterPanel.this);
+                            window.dispose();
+
+                            // Abrir la nueva ventana con los 4 botones
+                            MenuWindow menuWindow = new MenuWindow();
+                            menuWindow.setVisible(true);
+                        } else {
+                            JOptionPane.showMessageDialog(null, "Credenciales incorrectas");
+                        }
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                        JOptionPane.showMessageDialog(null, "Error al intentar iniciar sesión");
                     }
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                    JOptionPane.showMessageDialog(null, "Error al intentar iniciar sesión");
                 }
             }
         });
@@ -77,16 +79,63 @@ public final class LoginRegisterPanel extends JPanel {
         registerButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String email = emailField.getText();
-                String password = new String(passwordField.getPassword());
-                String name = nameField.getText();
-                try {
-                    databaseHandler.insertUser(email, password, name);
-                    JOptionPane.showMessageDialog(null, "Usuario registrado exitosamente");
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                    JOptionPane.showMessageDialog(null, "Error al intentar registrar usuario");
-                }
+                // Crear una ventana para el registro
+                JFrame registerFrame = new JFrame("Registro");
+                registerFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                registerFrame.setSize(400, 200);
+
+                // Panel para el registro
+                JPanel registerPanel = new JPanel(new GridLayout(0, 2));
+                registerFrame.add(registerPanel);
+
+                // Componentes para el registro
+                JLabel emailLabel = new JLabel("Correo:");
+                registerPanel.add(emailLabel);
+                JTextField registerEmailField = new JTextField();
+                registerPanel.add(registerEmailField);
+
+                JLabel passwordLabel = new JLabel("Contraseña:");
+                registerPanel.add(passwordLabel);
+                JPasswordField registerPasswordField = new JPasswordField();
+                registerPanel.add(registerPasswordField);
+
+                JLabel nameLabel = new JLabel("Nombre:");
+                registerPanel.add(nameLabel);
+                JTextField registerNameField = new JTextField();
+                registerPanel.add(registerNameField);
+
+                // Botón de registro
+                JButton confirmButton = new JButton("Registrarse");
+                confirmButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        String email = registerEmailField.getText();
+                        String password = new String(registerPasswordField.getPassword());
+                        String name = registerNameField.getText();
+
+                        // Verifica si alguno de los campos está vacío
+                        if (email.isEmpty() || password.isEmpty() || name.isEmpty()) {
+                            JOptionPane.showMessageDialog(null, "Por favor, complete todos los campos");
+                        } else {
+                            try {
+                                // Intenta registrar al usuario
+                                databaseHandler.insertUser(email, password, name);
+                                JOptionPane.showMessageDialog(null, "Usuario registrado exitosamente");
+
+                                // Cierra la ventana de registro
+                                registerFrame.dispose();
+                            } catch (SQLException ex) {
+                                ex.printStackTrace();
+                                JOptionPane.showMessageDialog(null, "Error al intentar registrar usuario");
+                            }
+                        }
+                    }
+                });
+                registerPanel.add(confirmButton);
+
+                // Centra la ventana de registro
+                registerFrame.setLocationRelativeTo(null);
+                registerFrame.setVisible(true);
             }
         });
 
