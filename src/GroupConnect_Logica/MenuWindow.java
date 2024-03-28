@@ -50,6 +50,23 @@ public class MenuWindow extends JFrame {
 
         setLocationRelativeTo(null);
 
+        // Asociamos la acción de crear grupo al botón correspondiente
+        createGroupButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new CrearGrupoAction().actionPerformed(e);
+            }
+        });
+
+        // Asociamos la acción de unirse a grupo al botón correspondiente
+        joinGroupButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new UnirseGrupoAction().actionPerformed(e);
+            }
+        });
+
+
         myGroupButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
