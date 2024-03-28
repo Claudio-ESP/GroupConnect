@@ -40,7 +40,7 @@ public final class LoginRegisterPanel extends JPanel {
         passwordField = new JPasswordField();
         fieldsPanel.add(passwordField);
 
-        // Botones
+        // Botón "Iniciar sesión"
         JButton loginButton = new JButton("Iniciar sesión");
         loginButton.addActionListener(new ActionListener() {
             @Override
@@ -54,15 +54,15 @@ public final class LoginRegisterPanel extends JPanel {
                 } else {
                     try {
                         // Verifica las credenciales
-                        boolean loggedIn = databaseHandler.checkLogin(email, password);
-                        if (loggedIn) {
+                        int userId = databaseHandler.checkLogin(email, password);
+                        if (userId != -1) {
                             JOptionPane.showMessageDialog(null, "Inicio de sesión exitoso");
                             // Cerrar la ventana actual
                             Window window = SwingUtilities.getWindowAncestor(LoginRegisterPanel.this);
                             window.dispose();
 
                             // Abrir la nueva ventana con los 4 botones
-                            MenuWindow menuWindow = new MenuWindow();
+                            MenuWindow menuWindow = new MenuWindow(userId); // Pasa el userId al constructor
                             menuWindow.setVisible(true);
                         } else {
                             JOptionPane.showMessageDialog(null, "Credenciales incorrectas");
@@ -74,6 +74,7 @@ public final class LoginRegisterPanel extends JPanel {
                 }
             }
         });
+
 
         JButton registerButton = new JButton("Registrarse");
         registerButton.addActionListener(new ActionListener() {

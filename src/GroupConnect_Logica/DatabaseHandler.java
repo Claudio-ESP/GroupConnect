@@ -22,14 +22,18 @@ public class DatabaseHandler {
         }
     }
 
-    public static boolean checkLogin(String email, String password) throws SQLException {
-        String query = "SELECT * FROM users WHERE email = ? AND password = ?";
+    public static int checkLogin(String email, String password) throws SQLException {
+        String query = "SELECT id FROM users WHERE email = ? AND password = ?";
         try (Connection conn = getConnection();
              PreparedStatement statement = conn.prepareStatement(query)) {
             statement.setString(1, email);
             statement.setString(2, password);
             try (ResultSet resultSet = statement.executeQuery()) {
-                return resultSet.next(); // Si hay alguna fila, las credenciales son válidas
+                if (resultSet.next()) {
+                    return resultSet.getInt("id"); // Si hay una fila, devolvemos el userId
+                } else {
+                    return -1; // Si no hay ninguna fila, las credenciales no son válidas
+                }
             }
         }
     }
