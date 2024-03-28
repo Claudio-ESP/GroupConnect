@@ -40,6 +40,7 @@ public final class LoginRegisterPanel extends JPanel {
         passwordField = new JPasswordField();
         fieldsPanel.add(passwordField);
 
+
         // Botón "Iniciar sesión"
         JButton loginButton = new JButton("Iniciar sesión");
         loginButton.addActionListener(new ActionListener() {
