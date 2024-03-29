@@ -79,6 +79,7 @@ public class MenuWindow extends JFrame {
         // Resto de tu código
     }
 
+    // Se puede eliminar, de momento lo dejo para que si lo ejecutamos diga credenciales invalidas
     public static void main(String[] args) {
         try {
             // Intentamos hacer login con las credenciales
