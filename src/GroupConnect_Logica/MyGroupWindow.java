@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.sql.*;
 
 public class MyGroupWindow extends JFrame {
@@ -15,6 +16,22 @@ public class MyGroupWindow extends JFrame {
     private static final String PASSWORD = "";
 
     private int currentUserId;
+
+    private String profileImagePath;
+
+    private void showProfileImage(String imagePath) {
+        // Crear un JLabel para mostrar la imagen en la parte superior derecha
+        JLabel profilePictureLabel = new JLabel(new ImageIcon(imagePath));
+        profilePictureLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+        profilePictureLabel.setVerticalAlignment(SwingConstants.TOP);
+
+        // Agregar el JLabel al contentPane de MyGroupWindow
+        getContentPane().add(profilePictureLabel);
+
+        // Forzar al contentPane a redibujarse
+        revalidate();
+        repaint();
+    }
 
     public MyGroupWindow(MenuWindow menuWindow, int userId) {
         this.currentUserId = userId;
@@ -59,6 +76,26 @@ public class MyGroupWindow extends JFrame {
 
         setLocationRelativeTo(null);
 
+       // private String profileImagePath; // Variable para almacenar la ruta de la imagen de perfil
+
+        photoButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+                int result = fileChooser.showOpenDialog(MyGroupWindow.this);
+
+                if (result == JFileChooser.APPROVE_OPTION) {
+                    File selectedFile = fileChooser.getSelectedFile();
+                    profileImagePath = selectedFile.getAbsolutePath();
+
+                    // Mostrar la imagen en la parte superior derecha de la ventana
+                    showProfileImage(profileImagePath);
+                }
+            }
+        });
+
+
         participantsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -91,49 +128,6 @@ public class MyGroupWindow extends JFrame {
                 }
             }
         });
-
-        deleteAccountButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int confirmation = JOptionPane.showConfirmDialog(null, "¿Estás seguro de que deseas eliminar tu cuenta?");
-                if (confirmation == JOptionPane.YES_OPTION) {
-                    try {
-                        Connection connection = getConnection();
-
-                        // Eliminar al usuario de la tabla 'participantes' si pertenece a un grupo
-                        String sqlDeleteParticipant = "DELETE FROM participantes WHERE id_usuario = ?";
-                        PreparedStatement statementDeleteParticipant = connection.prepareStatement(sqlDeleteParticipant);
-                        statementDeleteParticipant.setInt(1, currentUserId);
-                        statementDeleteParticipant.executeUpdate();
-                        statementDeleteParticipant.close();
-
-                        // Eliminar al usuario de la tabla 'users'
-                        String sqlDeleteUser = "DELETE FROM users WHERE id = ?";
-                        PreparedStatement statementDeleteUser = connection.prepareStatement(sqlDeleteUser);
-                        statementDeleteUser.setInt(1, currentUserId);
-                        int rowsAffected = statementDeleteUser.executeUpdate();
-                        statementDeleteUser.close();
-
-                        if (rowsAffected > 0) {
-                            JOptionPane.showMessageDialog(null, "Tu cuenta ha sido eliminada exitosamente.");
-                            // Realizar otras acciones si es necesario, como cerrar la ventana actual
-                            dispose();
-                        } else {
-                            JOptionPane.showMessageDialog(null, "Error al intentar eliminar tu cuenta.");
-                        }
-
-                        connection.close();
-                    } catch (SQLException ex) {
-                        ex.printStackTrace();
-                        JOptionPane.showMessageDialog(null, "Error al eliminar tu cuenta.");
-                    }
-                }
-            }
-        });
-
-
-
-
 
         exitGroupButton.addActionListener(new ActionListener() {
             @Override
@@ -187,7 +181,45 @@ public class MyGroupWindow extends JFrame {
         });
 
 
+        deleteAccountButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int confirmation = JOptionPane.showConfirmDialog(null, "¿Estás seguro de que deseas eliminar tu cuenta?");
+                if (confirmation == JOptionPane.YES_OPTION) {
+                    try {
+                        Connection connection = getConnection();
 
+                        // Eliminar al usuario de la tabla 'participantes' si pertenece a un grupo
+                        String sqlDeleteParticipant = "DELETE FROM participantes WHERE id_usuario = ?";
+                        PreparedStatement statementDeleteParticipant = connection.prepareStatement(sqlDeleteParticipant);
+                        statementDeleteParticipant.setInt(1, currentUserId);
+                        statementDeleteParticipant.executeUpdate();
+                        statementDeleteParticipant.close();
+
+                        // Eliminar al usuario de la tabla 'users'
+                        String sqlDeleteUser = "DELETE FROM users WHERE id = ?";
+                        PreparedStatement statementDeleteUser = connection.prepareStatement(sqlDeleteUser);
+                        statementDeleteUser.setInt(1, currentUserId);
+                        int rowsAffected = statementDeleteUser.executeUpdate();
+                        statementDeleteUser.close();
+
+                        if (rowsAffected > 0) {
+                            JOptionPane.showMessageDialog(null, "Tu cuenta ha sido eliminada exitosamente.");
+                            // Realizar otras acciones si es necesario, como cerrar la ventana actual
+                            dispose();
+
+                        } else {
+                            JOptionPane.showMessageDialog(null, "Error al intentar eliminar tu cuenta.");
+                        }
+
+                        connection.close();
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                        JOptionPane.showMessageDialog(null, "Error al eliminar tu cuenta.");
+                    }
+                }
+            }
+        });
 
         addWindowListener(new WindowAdapter() {
             @Override
