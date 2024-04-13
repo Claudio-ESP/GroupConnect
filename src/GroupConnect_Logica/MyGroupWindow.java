@@ -233,3 +233,4 @@ public class MyGroupWindow extends JFrame {
         return DriverManager.getConnection(URL, USERNAME, PASSWORD);
     }
 }
+

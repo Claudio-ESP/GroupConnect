@@ -66,6 +66,14 @@ public class MenuWindow extends JFrame {
             }
         });
 
+        activitiesButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ActividadHandler actividadHandler = new ActividadHandler(currentUserId); // Pasar el userId al constructor
+                new ActividadesWindow(actividadHandler);
+            }
+        });
+
 
         myGroupButton.addActionListener(new ActionListener() {
             @Override
