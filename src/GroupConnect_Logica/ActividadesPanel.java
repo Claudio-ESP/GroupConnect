@@ -86,3 +86,4 @@ public class ActividadesPanel extends JPanel {
         add(tusActividadesButton);
     }
 }
+

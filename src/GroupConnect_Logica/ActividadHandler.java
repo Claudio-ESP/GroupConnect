@@ -58,6 +58,7 @@ public class ActividadHandler {
         return actividades;
     }
 
+    // Las actividades solo las puede borrar el usuario que ha creado la actividad
     public void eliminarActividad(String nombreActividad) throws SQLException {
         try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
             String sql = "DELETE FROM actividades WHERE nombre = ? AND creador_id = ?";
