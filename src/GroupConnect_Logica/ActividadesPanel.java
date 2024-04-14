@@ -9,11 +9,13 @@ import java.util.List;
 
 public class ActividadesPanel extends JPanel {
     private ActividadHandler actividadHandler;
+    private String groupName; // Campo para almacenar el nombre del grupo
 
-    public ActividadesPanel(ActividadHandler actividadHandler) {
+    public ActividadesPanel(ActividadHandler actividadHandler, String groupName) {
         this.actividadHandler = actividadHandler;
+        this.groupName = groupName;
 
-        setLayout(new GridLayout(2, 1));
+        setLayout(new GridLayout(3, 1));
 
         JButton crearActividadButton = new JButton("Crear Actividad");
         crearActividadButton.addActionListener(new ActionListener() {
@@ -32,7 +34,6 @@ public class ActividadesPanel extends JPanel {
                 }
             }
         });
-
         add(crearActividadButton);
 
         JButton unirseActividadButton = new JButton("Unirse a Actividad");
@@ -60,7 +61,28 @@ public class ActividadesPanel extends JPanel {
             }
         });
         add(unirseActividadButton);
+
+        JButton tusActividadesButton = new JButton("Actividades del grupo");
+        tusActividadesButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    List<String> actividades = actividadHandler.obtenerActividadesPorGrupo(); // Cambio aquí
+                    if (actividades.isEmpty()) {
+                        JOptionPane.showMessageDialog(null, "No hay actividades disponibles para tu grupo");
+                    } else {
+                        StringBuilder message = new StringBuilder("Actividades de tu grupo:\n");
+                        for (String actividad : actividades) {
+                            message.append(actividad).append("\n");
+                        }
+                        JOptionPane.showMessageDialog(null, message.toString());
+                    }
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(null, "Error al obtener actividades");
+                }
+            }
+        });
+        add(tusActividadesButton);
     }
 }
-
-
