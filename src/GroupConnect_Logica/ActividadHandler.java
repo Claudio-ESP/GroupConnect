@@ -58,6 +58,20 @@ public class ActividadHandler {
         return actividades;
     }
 
+    public void eliminarActividad(String nombreActividad) throws SQLException {
+        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
+            String sql = "DELETE FROM actividades WHERE nombre = ? AND creador_id = ?";
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setString(1, nombreActividad);
+                statement.setInt(2, this.currentUserId);
+                int rowsAffected = statement.executeUpdate();
+                if (rowsAffected == 0) {
+                    throw new SQLException("La actividad no pudo ser eliminada. Es posible que no tengas permiso para eliminar esta actividad.");
+                }
+            }
+        }
+    }
+
     private String obtenerNombreGrupo() throws SQLException {
         String groupName = null;
         try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {

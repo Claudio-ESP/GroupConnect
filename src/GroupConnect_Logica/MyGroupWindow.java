@@ -8,6 +8,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.sql.*;
+import java.util.List;
 
 public class MyGroupWindow extends JFrame {
 
@@ -56,18 +57,21 @@ public class MyGroupWindow extends JFrame {
 
         JButton participantsButton = new JButton("Participantes");
         JButton photoButton = new JButton("Foto");
-        JButton yourActivitiesButton = new JButton("Tus actividades");
-        JButton matchActivitiesButton = new JButton("Actividades con Match");
+        //JButton yourActivitiesButton = new JButton("Tus actividades"); De momento van a estar en actividades
+        //JButton matchActivitiesButton = new JButton("Actividades con Match"); De momento van a estar en actividades
         JButton exitGroupButton = new JButton("Salir de grupo");
         JButton deleteAccountButton = new JButton("Eliminar cuenta");
+        JButton deleteGroupActivitiesButton = new JButton("Eliminar actividades del grupo");
+
 
         buttonPanel.add(Box.createVerticalStrut(20));
         buttonPanel.add(participantsButton);
         buttonPanel.add(photoButton);
-        buttonPanel.add(yourActivitiesButton);
-        buttonPanel.add(matchActivitiesButton);
+       // buttonPanel.add(yourActivitiesButton); De momento van a estar en actividades
+       // buttonPanel.add(matchActivitiesButton); De momento van a estar en actividades
         buttonPanel.add(exitGroupButton);
         buttonPanel.add(deleteAccountButton);
+        buttonPanel.add(deleteGroupActivitiesButton);
         buttonPanel.add(Box.createVerticalStrut(20));
 
         contentPane.add(Box.createHorizontalStrut(130));
@@ -217,6 +221,37 @@ public class MyGroupWindow extends JFrame {
                         ex.printStackTrace();
                         JOptionPane.showMessageDialog(null, "Error al eliminar tu cuenta.");
                     }
+                }
+            }
+        });
+
+        deleteGroupActivitiesButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    // Obtener las actividades del grupo
+                    ActividadHandler actividadHandler = new ActividadHandler(currentUserId);
+                    List<String> actividades = actividadHandler.obtenerActividadesPorGrupo();
+                    if (actividades.isEmpty()) {
+                        JOptionPane.showMessageDialog(null, "No hay actividades disponibles para tu grupo");
+                    } else {
+                        // Mostrar las actividades y permitir al usuario seleccionar una para eliminar
+                        String[] actividadesArray = actividades.toArray(new String[0]);
+                        String actividadSeleccionada = (String) JOptionPane.showInputDialog(null, "Selecciona una actividad para eliminar:",
+                                "Eliminar actividades del grupo", JOptionPane.QUESTION_MESSAGE, null, actividadesArray, actividadesArray[0]);
+                        if (actividadSeleccionada != null) {
+                            // Confirmar la eliminación de la actividad
+                            int confirmacion = JOptionPane.showConfirmDialog(null, "¿Estás seguro de que deseas eliminar esta actividad?", "Confirmación", JOptionPane.YES_NO_OPTION);
+                            if (confirmacion == JOptionPane.YES_OPTION) {
+                                // Eliminar la actividad seleccionada
+                                actividadHandler.eliminarActividad(actividadSeleccionada);
+                                JOptionPane.showMessageDialog(null, "La actividad ha sido eliminada exitosamente");
+                            }
+                        }
+                    }
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(null, "Error al obtener o eliminar actividades del grupo");
                 }
             }
         });
