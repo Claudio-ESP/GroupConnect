@@ -29,6 +29,66 @@ public class ActividadHandler {
         }
     }
 
+    public void unirseActividad(String nombreActividad) throws SQLException {
+        // Obtener el nombre del grupo del usuario actual
+        String nombreGrupo = obtenerNombreGrupo();
+
+        // Obtener el ID de la actividad
+        int idActividad = obtenerIdActividadPorNombre(nombreActividad);
+
+        // Insertar datos en la tabla matches
+        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
+            String sql = "INSERT INTO matches (id_usuario, nombre_grupo, id_actividad) VALUES (?, ?, ?)";
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setInt(1, currentUserId);
+                statement.setString(2, nombreGrupo);
+                statement.setInt(3, idActividad);
+                statement.executeUpdate();
+            }
+        }
+    }
+
+
+   /* private int obtenerIdGrupoPorNombre(String nombreGrupo) throws SQLException {
+        int idGrupo = -1; // Valor por defecto en caso de que no se encuentre el grupo
+        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
+            String sql = "SELECT Grupo.id " +
+                    "FROM Grupo " +
+                    "JOIN participantes ON Grupo.nombre = participantes.nombreGrupo " +
+                    "WHERE participantes.id_usuario = ? AND participantes.nombreGrupo = ?";
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setInt(1, this.currentUserId);
+                statement.setString(2, nombreGrupo);
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    if (resultSet.next()) {
+                        idGrupo = resultSet.getInt("id");
+                    }
+                }
+            }
+        }
+        return idGrupo;
+    }*/
+
+
+
+    //Para obtener el id de la actividad en curso
+    private int obtenerIdActividadPorNombre(String nombreActividad) throws SQLException {
+        int idActividad = -1;
+        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
+            String sql = "SELECT id FROM actividades WHERE nombre = ?";
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setString(1, nombreActividad);
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    if (resultSet.next()) {
+                        idActividad = resultSet.getInt("id");
+                    }
+                }
+            }
+        }
+        return idActividad;
+    }
+
+
     public List<String> obtenerActividadesPorProvincia(String provincia) throws SQLException {
         List<String> actividades = new ArrayList<>();
         try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
@@ -46,17 +106,8 @@ public class ActividadHandler {
         return actividades;
     }
 
-    public List<String> obtenerActividadesPorGrupo() throws SQLException {
-        List<String> actividades = new ArrayList<>();
-        String nombreGrupo = obtenerNombreGrupo();
-        if (nombreGrupo == null) {
-            // Si el usuario no pertenece a ningún grupo, devuelve una lista vacía
-            return actividades;
-        }
-        List<Integer> userIds = obtenerUserIdsPorGrupo(nombreGrupo);
-        actividades = obtenerActividadesPorUsuarios(userIds);
-        return actividades;
-    }
+
+
 
     // Las actividades solo las puede borrar el usuario que ha creado la actividad
     public void eliminarActividad(String nombreActividad) throws SQLException {
@@ -72,6 +123,21 @@ public class ActividadHandler {
             }
         }
     }
+
+
+
+    public List<String> obtenerActividadesPorGrupo() throws SQLException {
+        List<String> actividades = new ArrayList<>();
+        String nombreGrupo = obtenerNombreGrupo();
+        if (nombreGrupo == null) {
+            // Si el usuario no pertenece a ningún grupo, devuelve una lista vacía
+            return actividades;
+        }
+        List<Integer> userIds = obtenerUserIdsPorGrupo(nombreGrupo);
+        actividades = obtenerActividadesPorUsuarios(userIds);
+        return actividades;
+    }
+
 
     private String obtenerNombreGrupo() throws SQLException {
         String groupName = null;

@@ -50,8 +50,13 @@ public class ActividadesPanel extends JPanel {
                         String actividadElegida = (String) JOptionPane.showInputDialog(null, "Selecciona una actividad:",
                                 "Actividades Disponibles", JOptionPane.QUESTION_MESSAGE, null, actividadesArray, actividadesArray[0]);
                         if (actividadElegida != null) {
-                            // Implementa la lógica para unirse a la actividad elegida
-                            JOptionPane.showMessageDialog(null, "Te has unido a la actividad: " + actividadElegida);
+                            try {
+                                actividadHandler.unirseActividad(actividadElegida);
+                                JOptionPane.showMessageDialog(null, "Te has unido a la actividad: " + actividadElegida);
+                            } catch (SQLException ex) {
+                                ex.printStackTrace();
+                                JOptionPane.showMessageDialog(null, "Error al unirse a la actividad");
+                            }
                         }
                     }
                 } catch (SQLException ex) {
@@ -60,6 +65,7 @@ public class ActividadesPanel extends JPanel {
                 }
             }
         });
+
         add(unirseActividadButton);
 
         JButton tusActividadesButton = new JButton("Actividades del grupo");
