@@ -6,16 +6,20 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 public class ActividadesPanel extends JPanel {
     private ActividadHandler actividadHandler;
     private String groupName; // Campo para almacenar el nombre del grupo
+    private int currentUserId;
+
 
     public ActividadesPanel(ActividadHandler actividadHandler, String groupName) {
         this.actividadHandler = actividadHandler;
         this.groupName = groupName;
+        this.currentUserId = currentUserId;
 
-        setLayout(new GridLayout(3, 1));
+        setLayout(new GridLayout(4, 1));
 
         JButton crearActividadButton = new JButton("Crear Actividad");
         crearActividadButton.addActionListener(new ActionListener() {
@@ -90,6 +94,99 @@ public class ActividadesPanel extends JPanel {
             }
         });
         add(tusActividadesButton);
+
+
+
+        JButton actividadesConMatchButton = new JButton("Actividades con Match");
+        actividadesConMatchButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    Map<String, List<Integer>> gruposConSolicitudes = actividadHandler.obtenerGruposConSolicitudes();
+                    if (gruposConSolicitudes.isEmpty()) {
+                        JOptionPane.showMessageDialog(null, "No hay grupos con solicitudes pendientes para tus actividades.");
+                    } else {
+                        JFrame frame = new JFrame("Solicitudes de Grupo");
+                        JPanel panel = new JPanel(new GridLayout(gruposConSolicitudes.size() + 1, 3));
+
+                        // Encabezados de la tabla
+                        // panel.add(new JLabel("Actividad"));
+                        // panel.add(new JLabel("Grupo"));
+                        // panel.add(new JLabel("Acción"));
+
+                        // Mostrar los grupos con solicitudes pendientes
+                        for (Map.Entry<String, List<Integer>> entry : gruposConSolicitudes.entrySet()) {
+                            String grupo = entry.getKey();
+                            List<Integer> idActividades = entry.getValue();
+                            for (Integer idActividad : idActividades) {
+                                String actividad = actividadHandler.obtenerNombreActividadPorId(idActividad);
+                                JLabel actividadLabel = new JLabel(actividad);
+                                JLabel grupoLabel = new JLabel(grupo);
+                                JButton aceptarButton = new JButton("Aceptar");
+                                JButton rechazarButton = new JButton("Rechazar");
+
+                                aceptarButton.addActionListener(new ActionListener() {
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        try {
+                                            actividadHandler.aceptarSolicitudUnion(grupo, idActividad);
+                                            JOptionPane.showMessageDialog(null, "Solicitud aceptada");
+                                            // Eliminar la entrada correspondiente de la interfaz
+                                            panel.remove(actividadLabel);
+                                            panel.remove(grupoLabel);
+                                            panel.remove(aceptarButton);
+                                            panel.remove(rechazarButton);
+                                            frame.pack();
+                                        } catch (SQLException ex) {
+                                            ex.printStackTrace();
+                                            JOptionPane.showMessageDialog(null, "Error al aceptar la solicitud");
+                                        }
+                                    }
+                                });
+
+                                rechazarButton.addActionListener(new ActionListener() {
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        try {
+                                            actividadHandler.rechazarSolicitudUnion(grupo, idActividad);
+                                            JOptionPane.showMessageDialog(null, "Solicitud rechazada");
+                                            // Eliminar la entrada correspondiente de la interfaz
+                                            panel.remove(actividadLabel);
+                                            panel.remove(grupoLabel);
+                                            panel.remove(aceptarButton);
+                                            panel.remove(rechazarButton);
+                                            frame.pack();
+                                        } catch (SQLException ex) {
+                                            ex.printStackTrace();
+                                            JOptionPane.showMessageDialog(null, "Error al rechazar la solicitud");
+                                        }
+                                    }
+                                });
+
+                                panel.add(actividadLabel);
+                                panel.add(grupoLabel);
+                                panel.add(aceptarButton);
+                                panel.add(rechazarButton);
+                            }
+                        }
+
+                        frame.add(panel);
+                        frame.pack();
+                        frame.setVisible(true);
+                    }
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(null, "Error al obtener grupos con solicitudes");
+                }
+            }
+        });
+        add(actividadesConMatchButton);
+
+
+
+
     }
+
+
 }
 
