@@ -97,7 +97,10 @@ public class ActividadesPanel extends JPanel {
 
 
 
-        JButton actividadesConMatchButton = new JButton("Actividades con Match");
+
+
+
+        JButton actividadesConMatchButton = new JButton("Solicitudes");
         actividadesConMatchButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -183,10 +186,37 @@ public class ActividadesPanel extends JPanel {
         add(actividadesConMatchButton);
 
 
+        JButton actividadesAceptadasButton = new JButton("Actividades Aceptadas");
+        actividadesAceptadasButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    Map<Integer, List<String>> actividadesConGrupos = actividadHandler.obtenerActividadesAceptadasConGrupos();
+                    if (actividadesConGrupos.isEmpty()) {
+                        JOptionPane.showMessageDialog(null, "No hay actividades aceptadas para mostrar");
+                    } else {
+                        StringBuilder message = new StringBuilder("Actividades Aceptadas:\n");
+                        for (Map.Entry<Integer, List<String>> entry : actividadesConGrupos.entrySet()) {
+                            int idActividad = entry.getKey();
+                            List<String> nombresGrupos = entry.getValue();
+                            String actividad = actividadHandler.obtenerNombreActividadPorId(idActividad);
+                            for (String nombreGrupo : nombresGrupos) {
+                                message.append(actividad).append(" - Grupo: ").append(nombreGrupo).append("\n");
+                            }
+                        }
+                        JOptionPane.showMessageDialog(null, message.toString());
+                    }
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(null, "Error al obtener actividades aceptadas");
+                }
+            }
+        });
+        add(actividadesAceptadasButton);
+
 
 
     }
-
 
 }
 

@@ -64,34 +64,6 @@ public class ActividadHandler {
     }
 
 
-
-
-
-    /*public Map<String, List<String>> obtenerGruposInteresados(String actividad) throws SQLException {
-        Map<String, List<String>> gruposInteresados = new HashMap<>();
-
-        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
-            String sql = "SELECT id_actividad, nombre_grupo FROM matches WHERE id_usuario = ?";
-            try (PreparedStatement statement = connection.prepareStatement(sql)) {
-                statement.setInt(1, currentUserId);
-                try (ResultSet resultSet = statement.executeQuery()) {
-                    while (resultSet.next()) {
-                        int idActividad = resultSet.getInt("id_actividad");
-                        String nombreGrupo = resultSet.getString("nombre_grupo");
-                        String nombreActividad = obtenerNombreActividadPorId(idActividad);
-
-                        if (!gruposInteresados.containsKey(nombreActividad)) {
-                            gruposInteresados.put(nombreActividad, new ArrayList<>());
-                        }
-                        gruposInteresados.get(nombreActividad).add(nombreGrupo);
-                    }
-                }
-            }
-        }
-        return gruposInteresados;
-    }*/
-
-
     String obtenerNombreActividadPorId(int idActividad) throws SQLException {
         String nombreActividad = null;
         try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
@@ -161,8 +133,8 @@ public class ActividadHandler {
             }
         }
         return idGrupo;
-    }*/
-
+    }
+*/
 
 
     // Métodos auxiliares para obtener el ID de una actividad por su nombre
@@ -199,8 +171,6 @@ public class ActividadHandler {
         }
         return actividades;
     }
-
-
 
 
     // Las actividades solo las puede borrar el usuario que ha creado la actividad
@@ -291,4 +261,34 @@ public class ActividadHandler {
         }
         return actividades;
     }
+
+    public Map<Integer, List<String>> obtenerActividadesAceptadasConGrupos() throws SQLException {
+        Map<Integer, List<String>> actividadesConGrupos = new HashMap<>();
+        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
+            String sql = "SELECT id_actividad, nombre_grupo " +
+                    "FROM solicitudes " +
+                    "WHERE estado = 'aceptada'";
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    while (resultSet.next()) {
+                        int idActividad = resultSet.getInt("id_actividad");
+                        String nombreGrupo = resultSet.getString("nombre_grupo");
+                        if (!actividadesConGrupos.containsKey(idActividad)) {
+                            actividadesConGrupos.put(idActividad, new ArrayList<>());
+                        }
+                        if (!actividadesConGrupos.get(idActividad).contains(nombreGrupo)) {
+                            actividadesConGrupos.get(idActividad).add(nombreGrupo);
+                        }
+                    }
+                }
+            }
+        }
+        return actividadesConGrupos;
+    }
+
+
+
+
+
+
 }
