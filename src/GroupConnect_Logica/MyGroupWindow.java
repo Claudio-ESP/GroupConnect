@@ -17,6 +17,7 @@ public class MyGroupWindow extends JFrame {
     private static final String PASSWORD = "";
 
     private int currentUserId;
+    private String currentGroupName;
 
     private String profileImagePath;
 
@@ -34,8 +35,9 @@ public class MyGroupWindow extends JFrame {
         repaint();
     }
 
-    public MyGroupWindow(MenuWindow menuWindow, int userId) {
+    public MyGroupWindow(MenuWindow menuWindow, int userId, String currentGroup) {
         this.currentUserId = userId;
+        this.currentGroupName = currentGroup;
 
         setTitle("Mi Grupo");
         setSize(400, 300);
@@ -67,8 +69,8 @@ public class MyGroupWindow extends JFrame {
         buttonPanel.add(Box.createVerticalStrut(20));
         buttonPanel.add(participantsButton);
         buttonPanel.add(photoButton);
-       // buttonPanel.add(yourActivitiesButton); De momento van a estar en actividades
-       // buttonPanel.add(matchActivitiesButton); De momento van a estar en actividades
+        // buttonPanel.add(yourActivitiesButton); De momento van a estar en actividades
+        // buttonPanel.add(matchActivitiesButton); De momento van a estar en actividades
         buttonPanel.add(exitGroupButton);
         buttonPanel.add(deleteAccountButton);
         buttonPanel.add(deleteGroupActivitiesButton);
@@ -80,7 +82,7 @@ public class MyGroupWindow extends JFrame {
 
         setLocationRelativeTo(null);
 
-       // private String profileImagePath; // Variable para almacenar la ruta de la imagen de perfil
+        // private String profileImagePath; // Variable para almacenar la ruta de la imagen de perfil
 
         photoButton.addActionListener(new ActionListener() {
             @Override
@@ -105,10 +107,9 @@ public class MyGroupWindow extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 try {
                     Connection connection = getConnection();
-                    String query = "SELECT id_usuario, participante FROM participantes WHERE nombreGrupo = " +
-                            "(SELECT nombreGrupo FROM participantes WHERE id_usuario = ?)";
+                    String query = "SELECT id_usuario, participante FROM participantes WHERE nombreGrupo = ?";
                     PreparedStatement statement = connection.prepareStatement(query);
-                    statement.setInt(1, currentUserId);
+                    statement.setString(1, currentGroupName);
                     ResultSet resultSet = statement.executeQuery();
 
                     if (resultSet.next()) {
@@ -120,7 +121,7 @@ public class MyGroupWindow extends JFrame {
                         } while (resultSet.next());
                         JOptionPane.showMessageDialog(null, participants.toString());
                     } else {
-                        JOptionPane.showMessageDialog(null, "No perteneces a ningún grupo.");
+                        JOptionPane.showMessageDialog(null, "No hay participantes en el grupo.");
                     }
 
                     resultSet.close();
@@ -132,6 +133,7 @@ public class MyGroupWindow extends JFrame {
                 }
             }
         });
+
 
         exitGroupButton.addActionListener(new ActionListener() {
             @Override

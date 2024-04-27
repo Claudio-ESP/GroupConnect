@@ -230,4 +230,3 @@ public class ActividadesPanel extends JPanel {
     }
 
 }
-
