@@ -20,7 +20,7 @@ public class ActividadesWindow extends JFrame {
         setLocationRelativeTo(null);
         setVisible(true);
     }
-
+/*
     public static void main(String[] args) {
         // Para probar la ventana de actividades
         SwingUtilities.invokeLater(() -> {
@@ -28,6 +28,6 @@ public class ActividadesWindow extends JFrame {
             ActividadHandler actividadHandler = new ActividadHandler(currentUserId);
             new ActividadesWindow(actividadHandler);
         });
-    }
+    }*/
 
 }

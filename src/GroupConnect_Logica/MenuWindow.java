@@ -17,9 +17,9 @@ import static GroupConnect_Logica.DatabaseHandler.getConnection;
 public class MenuWindow extends JFrame {
 
     private int currentUserId; // Campo para almacenar el userId actual
-    private String currentGroupName;
+    private static String currentGroupName;
 
-    public String getCurrentGroupName() {
+    public static String getCurrentGroupName() {
         return currentGroupName;
     }
 
@@ -112,7 +112,7 @@ public class MenuWindow extends JFrame {
         activitiesButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ActividadHandler actividadHandler = new ActividadHandler(currentUserId); // Pasar el userId al constructor
+                ActividadHandler actividadHandler = new ActividadHandler(currentUserId, getCurrentGroupName()); // Pasar el nombre del grupo también
                 new ActividadesWindow(actividadHandler);
             }
         });
@@ -126,8 +126,6 @@ public class MenuWindow extends JFrame {
                 myGroupWindow.setVisible(true);
             }
         });
-
-
 
     }
 

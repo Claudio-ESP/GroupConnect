@@ -21,6 +21,7 @@ public class ActividadesPanel extends JPanel {
 
         setLayout(new GridLayout(4, 1));
 
+
         JButton crearActividadButton = new JButton("Crear Actividad");
         crearActividadButton.addActionListener(new ActionListener() {
             @Override
@@ -101,7 +102,9 @@ public class ActividadesPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    Map<String, List<Integer>> gruposConSolicitudes = actividadHandler.obtenerGruposConSolicitudes();
+                    // Llama al método obteniendo currentGroupName de la instancia de MenuWindow
+
+                    Map<String, List<Integer>> gruposConSolicitudes = actividadHandler.obtenerGruposConSolicitudes(MenuWindow.getCurrentGroupName());
                     if (gruposConSolicitudes.isEmpty()) {
                         JOptionPane.showMessageDialog(null, "No hay grupos con solicitudes pendientes para tus actividades.");
                     } else {
@@ -180,6 +183,7 @@ public class ActividadesPanel extends JPanel {
             }
         });
         add(actividadesConMatchButton);
+
 
 
         JButton actividadesAceptadasButton = new JButton("Actividades Aceptadas");

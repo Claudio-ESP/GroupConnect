@@ -12,20 +12,23 @@ public class ActividadHandler {
     private static final String PASSWORD = "";
 
     private int currentUserId; // Campo para almacenar el userId actual
+    private String currentGroupName;
 
-    public ActividadHandler(int currentUserId) {
+
+    public ActividadHandler(int currentUserId, String currentGroupName) {
         this.currentUserId = currentUserId;
+        this.currentGroupName = currentGroupName;
     }
 
 
-    public Map<String, List<Integer>> obtenerGruposConSolicitudes() throws SQLException {
+    public Map<String, List<Integer>> obtenerGruposConSolicitudes(String currentGroupName) throws SQLException {
         Map<String, List<Integer>> gruposConSolicitudes = new HashMap<>();
         try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
             String sql = "SELECT nombre_grupo, id_actividad FROM matches " +
                     "WHERE id_actividad IN (SELECT id_actividad FROM matches " +
-                    "WHERE nombre_grupo IN (SELECT nombreGrupo FROM participantes WHERE id_usuario = ?))";
+                    "WHERE nombre_grupo = ?)";
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
-                statement.setInt(1, currentUserId);
+                statement.setString(1, currentGroupName);
                 try (ResultSet resultSet = statement.executeQuery()) {
                     while (resultSet.next()) {
                         String grupo = resultSet.getString("nombre_grupo");
@@ -40,6 +43,7 @@ public class ActividadHandler {
         }
         return gruposConSolicitudes;
     }
+
 
     public void aceptarSolicitudUnion(String nombreGrupo, int idActividad) throws SQLException {
         try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
@@ -192,7 +196,7 @@ public class ActividadHandler {
 
     public List<String> obtenerActividadesPorGrupo() throws SQLException {
         List<String> actividades = new ArrayList<>();
-        String nombreGrupo = obtenerNombreGrupo();
+        String nombreGrupo = MenuWindow.getCurrentGroupName(); // Aquí asumimos que tienes acceso a menuWindow
         if (nombreGrupo == null) {
             // Si el usuario no pertenece a ningún grupo, devuelve una lista vacía
             return actividades;
@@ -201,6 +205,7 @@ public class ActividadHandler {
         actividades = obtenerActividadesPorUsuarios(userIds);
         return actividades;
     }
+
 
 
     private String obtenerNombreGrupo() throws SQLException {

@@ -35,9 +35,9 @@ public class MyGroupWindow extends JFrame {
         repaint();
     }
 
-    public MyGroupWindow(MenuWindow menuWindow, int userId, String currentGroup) {
+    public MyGroupWindow(MenuWindow menuWindow, int userId, String currentGroupName) {
         this.currentUserId = userId;
-        this.currentGroupName = currentGroup;
+        this.currentGroupName = currentGroupName;
 
         setTitle("Mi Grupo");
         setSize(400, 300);
@@ -231,25 +231,32 @@ public class MyGroupWindow extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    // Obtener las actividades del grupo
-                    ActividadHandler actividadHandler = new ActividadHandler(currentUserId);
-                    List<String> actividades = actividadHandler.obtenerActividadesPorGrupo();
-                    if (actividades.isEmpty()) {
-                        JOptionPane.showMessageDialog(null, "No hay actividades disponibles para tu grupo");
-                    } else {
-                        // Mostrar las actividades y permitir al usuario seleccionar una para eliminar
-                        String[] actividadesArray = actividades.toArray(new String[0]);
-                        String actividadSeleccionada = (String) JOptionPane.showInputDialog(null, "Selecciona una actividad para eliminar:",
-                                "Eliminar actividades del grupo", JOptionPane.QUESTION_MESSAGE, null, actividadesArray, actividadesArray[0]);
-                        if (actividadSeleccionada != null) {
-                            // Confirmar la eliminación de la actividad
-                            int confirmacion = JOptionPane.showConfirmDialog(null, "¿Estás seguro de que deseas eliminar esta actividad?", "Confirmación", JOptionPane.YES_NO_OPTION);
-                            if (confirmacion == JOptionPane.YES_OPTION) {
-                                // Eliminar la actividad seleccionada
-                                actividadHandler.eliminarActividad(actividadSeleccionada);
-                                JOptionPane.showMessageDialog(null, "La actividad ha sido eliminada exitosamente");
+                    // Obtener el nombre del grupo actual
+                    String currentGroupName = menuWindow.getCurrentGroupName();
+                    // Verificar si el nombre del grupo actual no es nulo o vacío
+                    if (currentGroupName != null && !currentGroupName.isEmpty()) {
+                        // Obtener las actividades del grupo
+                        ActividadHandler actividadHandler = new ActividadHandler(currentUserId, currentGroupName);
+                        List<String> actividades = actividadHandler.obtenerActividadesPorGrupo();
+                        if (actividades.isEmpty()) {
+                            JOptionPane.showMessageDialog(null, "No hay actividades disponibles para tu grupo");
+                        } else {
+                            // Mostrar las actividades y permitir al usuario seleccionar una para eliminar
+                            String[] actividadesArray = actividades.toArray(new String[0]);
+                            String actividadSeleccionada = (String) JOptionPane.showInputDialog(null, "Selecciona una actividad para eliminar:",
+                                    "Eliminar actividades del grupo", JOptionPane.QUESTION_MESSAGE, null, actividadesArray, actividadesArray[0]);
+                            if (actividadSeleccionada != null) {
+                                // Confirmar la eliminación de la actividad
+                                int confirmacion = JOptionPane.showConfirmDialog(null, "¿Estás seguro de que deseas eliminar esta actividad?", "Confirmación", JOptionPane.YES_NO_OPTION);
+                                if (confirmacion == JOptionPane.YES_OPTION) {
+                                    // Eliminar la actividad seleccionada
+                                    actividadHandler.eliminarActividad(actividadSeleccionada);
+                                    JOptionPane.showMessageDialog(null, "La actividad ha sido eliminada exitosamente");
+                                }
                             }
                         }
+                    } else {
+                        JOptionPane.showMessageDialog(null, "No se ha seleccionado un grupo.");
                     }
                 } catch (SQLException ex) {
                     ex.printStackTrace();
@@ -257,6 +264,7 @@ public class MyGroupWindow extends JFrame {
                 }
             }
         });
+
 
         addWindowListener(new WindowAdapter() {
             @Override
