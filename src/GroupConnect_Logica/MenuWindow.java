@@ -132,6 +132,17 @@ public class MenuWindow extends JFrame {
             }
         });
 
+        JButton exitButton = new JButton("Salir");
+        exitButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Cerrar el programa entero
+                System.exit(0);
+            }
+        });
+        buttonPanel.add(exitButton);
+
+
     }
 
     // Método para obtener los grupos del usuario

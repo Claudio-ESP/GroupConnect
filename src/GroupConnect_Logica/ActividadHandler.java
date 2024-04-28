@@ -304,4 +304,28 @@ public class ActividadHandler {
     }
 
 
+    public boolean solicitudProcesada(String grupo, String actividad) throws SQLException {
+        boolean procesada = false;
+        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
+            String sql = "SELECT estado FROM solicitudes WHERE nombre_grupo = ? AND id_actividad = ?";
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setString(1, grupo);
+                statement.setString(2, actividad);
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    if (resultSet.next()) {
+                        String estado = resultSet.getString("estado");
+                        procesada = estado.equals("aceptado") || estado.equals("rechazado");
+                    }
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            // Manejo del error en caso de excepción
+        }
+        return procesada;
+    }
+
+
+
+
 }

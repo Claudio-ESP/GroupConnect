@@ -161,3 +161,4 @@ public final class LoginRegisterPanel extends JPanel {
         frame.setVisible(true);
     }
 }
+

@@ -119,62 +119,65 @@ public class ActividadesPanel extends JPanel {
                         JPanel panel = new JPanel(new GridLayout(gruposConSolicitudes.size() + 1, 3));
 
                         // Encabezados de la tabla
-                      //  panel.add(new JLabel("Actividad"));
-                      //  panel.add(new JLabel("Grupo"));
-                      //  panel.add(new JLabel("Acción"));
+                        panel.add(new JLabel("Actividad"));
+                        panel.add(new JLabel("Grupo"));
+                        panel.add(new JLabel("Acción"));
 
-                        // Mostrar las actividades con solicitudes pendientes
+                        // Verificar las solicitudes pendientes y agregar botones solo para las no procesadas
                         for (Map.Entry<String, List<String>> entry : gruposConSolicitudes.entrySet()) {
                             String grupo = entry.getKey();
                             List<String> actividades = entry.getValue();
                             for (String actividad : actividades) {
-                                JLabel actividadLabel = new JLabel(actividad);
-                                JLabel grupoLabel = new JLabel(grupo);
-                                JButton aceptarButton = new JButton("Aceptar");
-                                JButton rechazarButton = new JButton("Rechazar");
+                                // Verificar si la solicitud ya ha sido procesada
+                                if (!actividadHandler.solicitudProcesada(grupo, actividad)) {
+                                    JLabel actividadLabel = new JLabel(actividad);
+                                    JLabel grupoLabel = new JLabel(grupo);
+                                    JButton aceptarButton = new JButton("Aceptar");
+                                    JButton rechazarButton = new JButton("Rechazar");
 
-                                aceptarButton.addActionListener(new ActionListener() {
-                                    @Override
-                                    public void actionPerformed(ActionEvent e) {
-                                        try {
-                                            actividadHandler.aceptarSolicitudUnion(grupo, actividad);
-                                            JOptionPane.showMessageDialog(null, "Solicitud aceptada");
-                                            // Eliminar la entrada correspondiente de la interfaz
-                                            panel.remove(actividadLabel);
-                                            panel.remove(grupoLabel);
-                                            panel.remove(aceptarButton);
-                                            panel.remove(rechazarButton);
-                                            frame.pack();
-                                        } catch (SQLException ex) {
-                                            ex.printStackTrace();
-                                            JOptionPane.showMessageDialog(null, "Error al aceptar la solicitud");
+                                    aceptarButton.addActionListener(new ActionListener() {
+                                        @Override
+                                        public void actionPerformed(ActionEvent e) {
+                                            try {
+                                                actividadHandler.aceptarSolicitudUnion(grupo, actividad);
+                                                JOptionPane.showMessageDialog(null, "Solicitud aceptada");
+                                                // Eliminar la entrada correspondiente de la interfaz
+                                                panel.remove(actividadLabel);
+                                                panel.remove(grupoLabel);
+                                                panel.remove(aceptarButton);
+                                                panel.remove(rechazarButton);
+                                                frame.pack();
+                                            } catch (SQLException ex) {
+                                                ex.printStackTrace();
+                                                JOptionPane.showMessageDialog(null, "Error al aceptar la solicitud");
+                                            }
                                         }
-                                    }
-                                });
+                                    });
 
-                                rechazarButton.addActionListener(new ActionListener() {
-                                    @Override
-                                    public void actionPerformed(ActionEvent e) {
-                                        try {
-                                            actividadHandler.rechazarSolicitudUnion(grupo, actividad);
-                                            JOptionPane.showMessageDialog(null, "Solicitud rechazada");
-                                            // Eliminar la entrada correspondiente de la interfaz
-                                            panel.remove(actividadLabel);
-                                            panel.remove(grupoLabel);
-                                            panel.remove(aceptarButton);
-                                            panel.remove(rechazarButton);
-                                            frame.pack();
-                                        } catch (SQLException ex) {
-                                            ex.printStackTrace();
-                                            JOptionPane.showMessageDialog(null, "Error al rechazar la solicitud");
+                                    rechazarButton.addActionListener(new ActionListener() {
+                                        @Override
+                                        public void actionPerformed(ActionEvent e) {
+                                            try {
+                                                actividadHandler.rechazarSolicitudUnion(grupo, actividad);
+                                                JOptionPane.showMessageDialog(null, "Solicitud rechazada");
+                                                // Eliminar la entrada correspondiente de la interfaz
+                                                panel.remove(actividadLabel);
+                                                panel.remove(grupoLabel);
+                                                panel.remove(aceptarButton);
+                                                panel.remove(rechazarButton);
+                                                frame.pack();
+                                            } catch (SQLException ex) {
+                                                ex.printStackTrace();
+                                                JOptionPane.showMessageDialog(null, "Error al rechazar la solicitud");
+                                            }
                                         }
-                                    }
-                                });
+                                    });
 
-                                panel.add(actividadLabel);
-                                panel.add(grupoLabel);
-                                panel.add(aceptarButton);
-                                panel.add(rechazarButton);
+                                    panel.add(actividadLabel);
+                                    panel.add(grupoLabel);
+                                    panel.add(aceptarButton);
+                                    panel.add(rechazarButton);
+                                }
                             }
                         }
 
@@ -189,6 +192,7 @@ public class ActividadesPanel extends JPanel {
             }
         });
         add(actividadesConMatchButton);
+
 
 
 
@@ -210,6 +214,19 @@ public class ActividadesPanel extends JPanel {
         });
         add(actividadesAceptadasButton);
 
+        JButton backButton = new JButton("Atrás");
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Crear una instancia de MenuWindow
+               // MenuWindow menuWindow = new MenuWindow(currentUserId);
+                // Mostrar MenuWindow
+               // menuWindow.setVisible(true);
+                // Cerrar la ventana actual
+                SwingUtilities.getWindowAncestor(ActividadesPanel.this).dispose();
+            }
+        });
+        add(backButton);
 
 
 

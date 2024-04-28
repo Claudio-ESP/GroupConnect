@@ -249,6 +249,17 @@ public class MyGroupWindow extends JFrame {
             }
         });
 
+        JButton backButton = new JButton("Atrás");
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setVisible(false); // Ocultar la ventana actual
+                menuWindow.setVisible(true); // Hacer visible la ventana de inicio
+            }
+        });
+        buttonPanel.add(backButton);
+
+
 
         addWindowListener(new WindowAdapter() {
             @Override
@@ -257,6 +268,8 @@ public class MyGroupWindow extends JFrame {
             }
         });
     }
+
+
 
     private Connection getConnection() throws SQLException {
         return DriverManager.getConnection(URL, USERNAME, PASSWORD);
