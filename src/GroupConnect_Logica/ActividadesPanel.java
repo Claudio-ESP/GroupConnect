@@ -107,8 +107,11 @@ public class ActividadesPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 try {
                     // Llama al método obteniendo currentGroupName de la instancia de MenuWindow
+                    String currentGroupName = MenuWindow.getCurrentGroupName();
 
-                    Map<String, List<Integer>> gruposConSolicitudes = actividadHandler.obtenerGruposConSolicitudes(MenuWindow.getCurrentGroupName());
+                    // Obtener todas las actividades del grupo actual con solicitudes pendientes
+                    Map<String, List<String>> gruposConSolicitudes = actividadHandler.obtenerGruposConSolicitudes(currentGroupName);
+
                     if (gruposConSolicitudes.isEmpty()) {
                         JOptionPane.showMessageDialog(null, "No hay grupos con solicitudes pendientes para tus actividades.");
                     } else {
@@ -116,16 +119,15 @@ public class ActividadesPanel extends JPanel {
                         JPanel panel = new JPanel(new GridLayout(gruposConSolicitudes.size() + 1, 3));
 
                         // Encabezados de la tabla
-                        // panel.add(new JLabel("Actividad"));
-                        // panel.add(new JLabel("Grupo"));
-                        // panel.add(new JLabel("Acción"));
+                      //  panel.add(new JLabel("Actividad"));
+                      //  panel.add(new JLabel("Grupo"));
+                      //  panel.add(new JLabel("Acción"));
 
-                        // Mostrar los grupos con solicitudes pendientes
-                        for (Map.Entry<String, List<Integer>> entry : gruposConSolicitudes.entrySet()) {
+                        // Mostrar las actividades con solicitudes pendientes
+                        for (Map.Entry<String, List<String>> entry : gruposConSolicitudes.entrySet()) {
                             String grupo = entry.getKey();
-                            List<Integer> idActividades = entry.getValue();
-                            for (Integer idActividad : idActividades) {
-                                String actividad = actividadHandler.obtenerNombreActividadPorId(idActividad);
+                            List<String> actividades = entry.getValue();
+                            for (String actividad : actividades) {
                                 JLabel actividadLabel = new JLabel(actividad);
                                 JLabel grupoLabel = new JLabel(grupo);
                                 JButton aceptarButton = new JButton("Aceptar");
@@ -135,7 +137,7 @@ public class ActividadesPanel extends JPanel {
                                     @Override
                                     public void actionPerformed(ActionEvent e) {
                                         try {
-                                            actividadHandler.aceptarSolicitudUnion(grupo, idActividad);
+                                            actividadHandler.aceptarSolicitudUnion(grupo, actividad);
                                             JOptionPane.showMessageDialog(null, "Solicitud aceptada");
                                             // Eliminar la entrada correspondiente de la interfaz
                                             panel.remove(actividadLabel);
@@ -154,7 +156,7 @@ public class ActividadesPanel extends JPanel {
                                     @Override
                                     public void actionPerformed(ActionEvent e) {
                                         try {
-                                            actividadHandler.rechazarSolicitudUnion(grupo, idActividad);
+                                            actividadHandler.rechazarSolicitudUnion(grupo, actividad);
                                             JOptionPane.showMessageDialog(null, "Solicitud rechazada");
                                             // Eliminar la entrada correspondiente de la interfaz
                                             panel.remove(actividadLabel);
@@ -187,6 +189,7 @@ public class ActividadesPanel extends JPanel {
             }
         });
         add(actividadesConMatchButton);
+
 
 
 

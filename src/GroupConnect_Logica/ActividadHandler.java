@@ -21,22 +21,23 @@ public class ActividadHandler {
     }
 
 
-    public Map<String, List<Integer>> obtenerGruposConSolicitudes(String currentGroupName) throws SQLException {
-        Map<String, List<Integer>> gruposConSolicitudes = new HashMap<>();
+    public Map<String, List<String>> obtenerGruposConSolicitudes(String currentGroupName) throws SQLException {
+        Map<String, List<String>> gruposConSolicitudes = new HashMap<>();
         try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
-            String sql = "SELECT nombre_grupo, id_actividad FROM matches " +
-                    "WHERE id_actividad IN (SELECT id_actividad FROM matches " +
-                    "WHERE nombre_grupo = ?)";
+            String sql = "SELECT DISTINCT A.nombre_grupo, A.id_actividad, B.nombre AS nombre_actividad " +
+                    "FROM matches A " +
+                    "INNER JOIN actividades B ON A.id_actividad = B.id " +
+                    "WHERE A.actividad_grupo = ?";
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setString(1, currentGroupName);
                 try (ResultSet resultSet = statement.executeQuery()) {
                     while (resultSet.next()) {
                         String grupo = resultSet.getString("nombre_grupo");
-                        int idActividad = resultSet.getInt("id_actividad");
+                        String actividad = resultSet.getString("nombre_actividad");
                         if (!gruposConSolicitudes.containsKey(grupo)) {
                             gruposConSolicitudes.put(grupo, new ArrayList<>());
                         }
-                        gruposConSolicitudes.get(grupo).add(idActividad);
+                        gruposConSolicitudes.get(grupo).add(actividad);
                     }
                 }
             }
@@ -45,27 +46,31 @@ public class ActividadHandler {
     }
 
 
-    public void aceptarSolicitudUnion(String nombreGrupo, int idActividad) throws SQLException {
+
+    public void aceptarSolicitudUnion(String nombreGrupo, String nombreActividad) throws SQLException {
         try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
-            String sql = "INSERT INTO solicitudes (nombre_grupo, id_actividad, estado) VALUES (?, ?, 'aceptada')";
+            String sql = "INSERT INTO solicitudes (id_actividad, nombre_grupo, estado) " +
+                    "VALUES ((SELECT id FROM actividades WHERE nombre = ?), ?, 'aceptado')";
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
-                statement.setString(1, nombreGrupo);
-                statement.setInt(2, idActividad);
+                statement.setString(1, nombreActividad);
+                statement.setString(2, nombreGrupo);
                 statement.executeUpdate();
             }
         }
     }
 
-    public void rechazarSolicitudUnion(String nombreGrupo, int idActividad) throws SQLException {
+    public void rechazarSolicitudUnion(String nombreGrupo, String nombreActividad) throws SQLException {
         try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
-            String sql = "INSERT INTO solicitudes (nombre_grupo, id_actividad, estado) VALUES (?, ?, 'rechazada')";
+            String sql = "INSERT INTO solicitudes (id_actividad, nombre_grupo, estado) " +
+                    "VALUES ((SELECT id FROM actividades WHERE nombre = ?), ?, 'rechazado')";
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
-                statement.setString(1, nombreGrupo);
-                statement.setInt(2, idActividad);
+                statement.setString(1, nombreActividad);
+                statement.setString(2, nombreGrupo);
                 statement.executeUpdate();
             }
         }
     }
+
 
 
     String obtenerNombreActividadPorId(int idActividad) throws SQLException {
@@ -141,32 +146,6 @@ public class ActividadHandler {
         }
         return nombreGrupo;
     }
-
-
-
-
-
-// se puede eliminar es temporal de momento
-   /* private int obtenerIdGrupoPorNombre(String nombreGrupo) throws SQLException {
-        int idGrupo = -1; // Valor por defecto en caso de que no se encuentre el grupo
-        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
-            String sql = "SELECT Grupo.id " +
-                    "FROM Grupo " +
-                    "JOIN participantes ON Grupo.nombre = participantes.nombreGrupo " +
-                    "WHERE participantes.id_usuario = ? AND participantes.nombreGrupo = ?";
-            try (PreparedStatement statement = connection.prepareStatement(sql)) {
-                statement.setInt(1, this.currentUserId);
-                statement.setString(2, nombreGrupo);
-                try (ResultSet resultSet = statement.executeQuery()) {
-                    if (resultSet.next()) {
-                        idGrupo = resultSet.getInt("id");
-                    }
-                }
-            }
-        }
-        return idGrupo;
-    }
-*/
 
 
     // Métodos auxiliares para obtener el ID de una actividad por su nombre
@@ -251,69 +230,6 @@ public class ActividadHandler {
         return actividades;
     }
 
-
-
-/*
-    private String obtenerNombreGrupo() throws SQLException {
-        String groupName = null;
-        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
-            String sql = "SELECT nombreGrupo FROM participantes WHERE id_usuario = ?";
-            try (PreparedStatement statement = connection.prepareStatement(sql)) {
-                statement.setInt(1, this.currentUserId);
-                try (ResultSet resultSet = statement.executeQuery()) {
-                    if (resultSet.next()) {
-                        groupName = resultSet.getString("nombreGrupo");
-                    }
-                }
-            }
-        }
-        return groupName;
-    }*/
-/*
-    private List<Integer> obtenerUserIdsPorGrupo(String groupName) throws SQLException {
-        List<Integer> userIds = new ArrayList<>();
-        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
-            String sql = "SELECT id_usuario FROM participantes WHERE nombreGrupo = ?";
-            try (PreparedStatement statement = connection.prepareStatement(sql)) {
-                statement.setString(1, groupName);
-                try (ResultSet resultSet = statement.executeQuery()) {
-                    while (resultSet.next()) {
-                        int userId = resultSet.getInt("id_usuario");
-                        userIds.add(userId);
-                    }
-                }
-            }
-        }
-        return userIds;
-    }
-
- */
-/*
-    private List<String> obtenerActividadesPorUsuarios(List<Integer> userIds) throws SQLException {
-        List<String> actividades = new ArrayList<>();
-        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
-            String sql = "SELECT nombre FROM actividades WHERE creador_id IN (";
-            for (int i = 0; i < userIds.size(); i++) {
-                if (i > 0) {
-                    sql += ",";
-                }
-                sql += "?";
-            }
-            sql += ")";
-            try (PreparedStatement statement = connection.prepareStatement(sql)) {
-                for (int i = 0; i < userIds.size(); i++) {
-                    statement.setInt(i + 1, userIds.get(i));
-                }
-                try (ResultSet resultSet = statement.executeQuery()) {
-                    while (resultSet.next()) {
-                        String nombre = resultSet.getString("nombre");
-                        actividades.add(nombre);
-                    }
-                }
-            }
-        }
-        return actividades;
-    }*/
 
     public Map<Integer, List<String>> obtenerActividadesAceptadasConGrupos() throws SQLException {
         Map<Integer, List<String>> actividadesConGrupos = new HashMap<>();
