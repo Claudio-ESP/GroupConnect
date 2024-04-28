@@ -1,5 +1,6 @@
 package GroupConnect_Logica;
 
+import javax.swing.*;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,11 +50,12 @@ public class ActividadHandler {
 
     public void aceptarSolicitudUnion(String nombreGrupo, String nombreActividad) throws SQLException {
         try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
-            String sql = "INSERT INTO solicitudes (id_actividad, nombre_grupo, estado) " +
-                    "VALUES ((SELECT id FROM actividades WHERE nombre = ?), ?, 'aceptado')";
+            String sql = "INSERT INTO solicitudes (id_actividad, nombre_grupo, grupo_actual, estado) " +
+                    "VALUES ((SELECT id FROM actividades WHERE nombre = ?), ?, ?, 'aceptado')";
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setString(1, nombreActividad);
                 statement.setString(2, nombreGrupo);
+                statement.setString(3, MenuWindow.getCurrentGroupName()); // Agregar grupo_actual
                 statement.executeUpdate();
             }
         }
@@ -61,11 +63,12 @@ public class ActividadHandler {
 
     public void rechazarSolicitudUnion(String nombreGrupo, String nombreActividad) throws SQLException {
         try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
-            String sql = "INSERT INTO solicitudes (id_actividad, nombre_grupo, estado) " +
-                    "VALUES ((SELECT id FROM actividades WHERE nombre = ?), ?, 'rechazado')";
+            String sql = "INSERT INTO solicitudes (id_actividad, nombre_grupo, grupo_actual, estado) " +
+                    "VALUES ((SELECT id FROM actividades WHERE nombre = ?), ?, ?, 'rechazado')";
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setString(1, nombreActividad);
                 statement.setString(2, nombreGrupo);
+                statement.setString(3, MenuWindow.getCurrentGroupName()); // Agregar grupo_actual
                 statement.executeUpdate();
             }
         }
@@ -73,7 +76,9 @@ public class ActividadHandler {
 
 
 
-    String obtenerNombreActividadPorId(int idActividad) throws SQLException {
+
+    // Método para obtener el nombre de la actividad por su ID desde la tabla actividades
+    private String obtenerNombreActividadPorId(int idActividad) {
         String nombreActividad = null;
         try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
             String sql = "SELECT nombre FROM actividades WHERE id = ?";
@@ -85,6 +90,9 @@ public class ActividadHandler {
                     }
                 }
             }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Error al obtener el nombre de la actividad");
         }
         return nombreActividad;
     }
@@ -230,29 +238,69 @@ public class ActividadHandler {
         return actividades;
     }
 
-
-    public Map<Integer, List<String>> obtenerActividadesAceptadasConGrupos() throws SQLException {
-        Map<Integer, List<String>> actividadesConGrupos = new HashMap<>();
+    public void mostrarSolicitudesAceptadas(String currentGroupName) {
+        StringBuilder message = new StringBuilder("Solicitudes Aceptadas:\n");
         try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
-            String sql = "SELECT id_actividad, nombre_grupo " +
+            String sql = "SELECT nombre_grupo, grupo_actual, id_actividad " +
                     "FROM solicitudes " +
-                    "WHERE estado = 'aceptada'";
+                    "WHERE estado = 'aceptado' AND (grupo_actual = ? OR nombre_grupo = ?)";
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setString(1, currentGroupName);
+                statement.setString(2, currentGroupName);
                 try (ResultSet resultSet = statement.executeQuery()) {
+                    boolean firstGroup = true;
                     while (resultSet.next()) {
-                        int idActividad = resultSet.getInt("id_actividad");
                         String nombreGrupo = resultSet.getString("nombre_grupo");
-                        if (!actividadesConGrupos.containsKey(idActividad)) {
-                            actividadesConGrupos.put(idActividad, new ArrayList<>());
+                        String grupoActual = resultSet.getString("grupo_actual");
+                        int idActividad = resultSet.getInt("id_actividad");
+                        String nombreActividad = obtenerNombreActividadPorId(idActividad);
+                        String descripcionActividad = obtenerDescripcionActividadPorId(idActividad);
+                        if (!nombreGrupo.equals(currentGroupName)) {
+                            if (firstGroup) {
+                                message.append("\nSolicitudes hacia otros grupos:\n");
+                                firstGroup = false;
+                            }
+                            message.append("Grupo destino: ").append(nombreGrupo).append("\n");
+                            message.append("Grupo origen: ").append(grupoActual).append("\n");
+                        } else {
+                            message.append("\nSolicitudes de nuestro grupo:\n");
+                            message.append("Grupo que nos ha aceptado: ").append(grupoActual).append("\n");
                         }
-                        if (!actividadesConGrupos.get(idActividad).contains(nombreGrupo)) {
-                            actividadesConGrupos.get(idActividad).add(nombreGrupo);
-                        }
+                       // message.append("ID de Actividad: ").append(idActividad).append("\n");
+                        message.append("Nombre Actividad: ").append(nombreActividad).append("\n");
+                        message.append("Descripción Actividad: ").append(descripcionActividad).append("\n\n");
                     }
                 }
             }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Error al obtener actividades aceptadas");
         }
-        return actividadesConGrupos;
+        JOptionPane.showMessageDialog(null, message.toString());
+    }
+
+
+
+
+
+    // Método para obtener la descripción de la actividad por su ID desde la tabla actividades
+    private String obtenerDescripcionActividadPorId(int idActividad) {
+        String descripcionActividad = null;
+        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
+            String sql = "SELECT descripcion FROM actividades WHERE id = ?";
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setInt(1, idActividad);
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    if (resultSet.next()) {
+                        descripcionActividad = resultSet.getString("descripcion");
+                    }
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Error al obtener la descripción de la actividad");
+        }
+        return descripcionActividad;
     }
 
 

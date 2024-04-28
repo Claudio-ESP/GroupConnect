@@ -197,45 +197,23 @@ public class ActividadesPanel extends JPanel {
         actividadesAceptadasButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                try {
-                    // Verificar si el usuario pertenece a algún grupo y si ese grupo tiene actividades creadas
-                    List<String> actividadesDelGrupo = actividadHandler.obtenerActividadesPorGrupo();
-                    if (actividadesDelGrupo.isEmpty()) {
-                        JOptionPane.showMessageDialog(null, "No tienes actividades aceptadas para mostrar");
-                        return; // Salir del método si no hay actividades del grupo
-                    }
-
-                    // Obtener las actividades aceptadas con los respectivos grupos
-                    Map<Integer, List<String>> actividadesConGrupos = actividadHandler.obtenerActividadesAceptadasConGrupos();
-                    if (actividadesConGrupos.isEmpty()) {
-                        JOptionPane.showMessageDialog(null, "No hay actividades aceptadas para mostrar");
-                    } else {
-                        StringBuilder message = new StringBuilder("Actividades Aceptadas del Grupo:\n");
-                        for (Map.Entry<Integer, List<String>> entry : actividadesConGrupos.entrySet()) {
-                            int idActividad = entry.getKey();
-                            List<String> grupos = entry.getValue();
-                            String actividad = actividadHandler.obtenerNombreActividadPorId(idActividad);
-                            if (actividadesDelGrupo.contains(actividad)) {
-                                message.append(actividad).append(": ");
-                                for (String grupo : grupos) {
-                                    message.append(grupo).append(", ");
-                                }
-                                // Eliminar la coma adicional al final
-                                if (!grupos.isEmpty()) {
-                                    message.delete(message.length() - 2, message.length());
-                                }
-                                message.append("\n");
-                            }
-                        }
-                        JOptionPane.showMessageDialog(null, message.toString());
-                    }
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                    JOptionPane.showMessageDialog(null, "Error al obtener actividades aceptadas");
+                // Obtener el nombre del grupo actual
+                String currentGroupName = MenuWindow.getCurrentGroupName();
+                if (currentGroupName == null || currentGroupName.isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "No se ha seleccionado un grupo.");
+                    return;
                 }
+
+                // Llamar al método mostrarSolicitudesAceptadas
+                actividadHandler.mostrarSolicitudesAceptadas(currentGroupName);
             }
         });
         add(actividadesAceptadasButton);
+
+
+
+
+
 
 
     }
