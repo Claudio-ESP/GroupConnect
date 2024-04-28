@@ -56,6 +56,7 @@ public class ActividadesPanel extends JPanel {
                                 "Actividades Disponibles", JOptionPane.QUESTION_MESSAGE, null, actividadesArray, actividadesArray[0]);
                         if (actividadElegida != null) {
                             try {
+                                // Unirse a la actividad sin pasar el nombre del grupo que la creó
                                 actividadHandler.unirseActividad(actividadElegida);
                                 JOptionPane.showMessageDialog(null, "Te has unido a la actividad: " + actividadElegida);
                             } catch (SQLException ex) {
@@ -71,6 +72,9 @@ public class ActividadesPanel extends JPanel {
             }
         });
 
+
+
+
         add(unirseActividadButton);
 
         JButton tusActividadesButton = new JButton("Actividades del grupo");
@@ -78,7 +82,7 @@ public class ActividadesPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    List<String> actividades = actividadHandler.obtenerActividadesPorGrupo(); // Cambio aquí
+                    List<String> actividades = actividadHandler.obtenerActividadesPorGrupo();
                     if (actividades.isEmpty()) {
                         JOptionPane.showMessageDialog(null, "No hay actividades disponibles para tu grupo");
                     } else {

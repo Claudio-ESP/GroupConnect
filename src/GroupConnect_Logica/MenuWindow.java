@@ -49,6 +49,11 @@ public class MenuWindow extends JFrame {
         // Obtener la lista de grupos del usuario
         List<String> userGroups = obtenerGruposUsuario(currentUserId);
 
+        if (userGroups.size() == 1) {
+            // Si el usuario pertenece a un solo grupo, establecer directamente el nombre del grupo
+            currentGroupName = userGroups.get(0);
+        }
+
         // Si el usuario pertenece a más de un grupo, agregar el botón "Elegir grupo"
         if (userGroups.size() > 1) {
             JButton chooseGroupButton = new JButton("Elegir grupo");

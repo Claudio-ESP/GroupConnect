@@ -147,36 +147,19 @@ public class MyGroupWindow extends JFrame {
                 if (confirmation == JOptionPane.YES_OPTION) {
                     try {
                         Connection connection = getConnection();
-                        // Consulta SQL para obtener el nombre del grupo del usuario actual
-                        String sqlGroupName = "SELECT nombreGrupo FROM participantes WHERE id_usuario = ?";
-                        PreparedStatement statementGroupName = connection.prepareStatement(sqlGroupName);
-                        statementGroupName.setInt(1, currentUserId);
-                        ResultSet resultSetGroupName = statementGroupName.executeQuery();
-
-                        String nombreGrupo = null;
-                        if (resultSetGroupName.next()) {
-                            nombreGrupo = resultSetGroupName.getString("nombreGrupo");
-                        }
-                        resultSetGroupName.close();
-                        statementGroupName.close();
-
-                        if (nombreGrupo != null) {
-                            // Realiza la eliminación del usuario del grupo
-                            String sql = "DELETE FROM participantes WHERE id_usuario = ? AND nombreGrupo = ?";
-                            PreparedStatement statement = connection.prepareStatement(sql);
-                            statement.setInt(1, currentUserId); // Establece el id_usuario
-                            statement.setString(2, nombreGrupo); // Establece el nombre del grupo obtenido
-                            int rowsAffected = statement.executeUpdate();
-                            if (rowsAffected > 0) {
-                                JOptionPane.showMessageDialog(null, "Has salido del grupo exitosamente.");
-                                // Realiza otras acciones si es necesario, como actualizar la interfaz de usuario
-                            } else {
-                                JOptionPane.showMessageDialog(null, "No se encontró la combinación de usuario y grupo.");
-                            }
-                            statement.close();
+                        // Realiza la eliminación del usuario del grupo
+                        String sql = "DELETE FROM participantes WHERE id_usuario = ? AND nombreGrupo = ?";
+                        PreparedStatement statement = connection.prepareStatement(sql);
+                        statement.setInt(1, currentUserId); // Establece el id_usuario
+                        statement.setString(2, currentGroupName); // Utiliza el nombre del grupo actual
+                        int rowsAffected = statement.executeUpdate();
+                        if (rowsAffected > 0) {
+                            JOptionPane.showMessageDialog(null, "Has salido del grupo exitosamente.");
+                            // Realiza otras acciones si es necesario, como actualizar la interfaz de usuario
                         } else {
-                            JOptionPane.showMessageDialog(null, "No se encontró el nombre del grupo para este usuario.");
+                            JOptionPane.showMessageDialog(null, "No se encontró la combinación de usuario y grupo.");
                         }
+                        statement.close();
                         connection.close();
                     } catch (SQLException ex) {
                         ex.printStackTrace();
@@ -185,6 +168,7 @@ public class MyGroupWindow extends JFrame {
                 }
             }
         });
+
 
 
         deleteAccountButton.addActionListener(new ActionListener() {
@@ -278,4 +262,3 @@ public class MyGroupWindow extends JFrame {
         return DriverManager.getConnection(URL, USERNAME, PASSWORD);
     }
 }
-
