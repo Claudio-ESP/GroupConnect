@@ -7,11 +7,15 @@ import java.awt.event.ActionListener;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
+
 
 public class ActividadesPanel extends JPanel {
     private ActividadHandler actividadHandler;
     private String groupName; // Campo para almacenar el nombre del grupo
     private int currentUserId;
+
+    private List<String> solicitudesProcesadas = new ArrayList<>();
 
 
     public ActividadesPanel(ActividadHandler actividadHandler, String groupName) {
@@ -101,6 +105,7 @@ public class ActividadesPanel extends JPanel {
         add(tusActividadesButton);
 
 
+
         JButton actividadesConMatchButton = new JButton("Solicitudes");
         actividadesConMatchButton.addActionListener(new ActionListener() {
             @Override
@@ -119,9 +124,9 @@ public class ActividadesPanel extends JPanel {
                         JPanel panel = new JPanel(new GridLayout(gruposConSolicitudes.size() + 1, 3));
 
                         // Encabezados de la tabla
-                        panel.add(new JLabel("Actividad"));
-                        panel.add(new JLabel("Grupo"));
-                        panel.add(new JLabel("Acción"));
+                       // panel.add(new JLabel("Actividad"));
+                       // panel.add(new JLabel("Grupo"));
+                       // panel.add(new JLabel("Acción"));
 
                         // Verificar las solicitudes pendientes y agregar botones solo para las no procesadas
                         for (Map.Entry<String, List<String>> entry : gruposConSolicitudes.entrySet()) {
@@ -129,7 +134,7 @@ public class ActividadesPanel extends JPanel {
                             List<String> actividades = entry.getValue();
                             for (String actividad : actividades) {
                                 // Verificar si la solicitud ya ha sido procesada
-                                if (!actividadHandler.solicitudProcesada(grupo, actividad)) {
+                                if (!actividadHandler.solicitudProcesada(grupo, actividad) && !solicitudesProcesadas.contains(grupo + ":" + actividad)) {
                                     JLabel actividadLabel = new JLabel(actividad);
                                     JLabel grupoLabel = new JLabel(grupo);
                                     JButton aceptarButton = new JButton("Aceptar");
@@ -141,6 +146,8 @@ public class ActividadesPanel extends JPanel {
                                             try {
                                                 actividadHandler.aceptarSolicitudUnion(grupo, actividad);
                                                 JOptionPane.showMessageDialog(null, "Solicitud aceptada");
+                                                // Agregar la solicitud a la lista de solicitudes procesadas
+                                                solicitudesProcesadas.add(grupo + ":" + actividad);
                                                 // Eliminar la entrada correspondiente de la interfaz
                                                 panel.remove(actividadLabel);
                                                 panel.remove(grupoLabel);
@@ -160,6 +167,8 @@ public class ActividadesPanel extends JPanel {
                                             try {
                                                 actividadHandler.rechazarSolicitudUnion(grupo, actividad);
                                                 JOptionPane.showMessageDialog(null, "Solicitud rechazada");
+                                                // Agregar la solicitud a la lista de solicitudes procesadas
+                                                solicitudesProcesadas.add(grupo + ":" + actividad);
                                                 // Eliminar la entrada correspondiente de la interfaz
                                                 panel.remove(actividadLabel);
                                                 panel.remove(grupoLabel);
@@ -192,6 +201,7 @@ public class ActividadesPanel extends JPanel {
             }
         });
         add(actividadesConMatchButton);
+
 
 
 

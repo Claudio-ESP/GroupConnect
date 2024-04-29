@@ -194,4 +194,3 @@ public class MenuWindow extends JFrame {
         }
     }
 }
-
