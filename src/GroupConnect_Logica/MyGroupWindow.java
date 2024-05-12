@@ -1,3 +1,4 @@
+
 package GroupConnect_Logica;
 
 import javax.swing.*;
@@ -18,8 +19,9 @@ public class MyGroupWindow extends JFrame {
 
     private int currentUserId;
     private String currentGroupName;
-
+    private JPanel contentPane;
     private String profileImagePath;
+    private JLabel backgroundLabel;
 
     private void showProfileImage(String imagePath) {
         // Crear un JLabel para mostrar la imagen en la parte superior derecha
@@ -35,6 +37,28 @@ public class MyGroupWindow extends JFrame {
         repaint();
     }
 
+    private void loadBackgroundPhoto() {
+        // Cargar la foto de fondo si existe para el grupo actual
+        try (Connection connection = getConnection()) {
+            String selectSql = "SELECT ruta_foto FROM foto WHERE nombre_grupo = ?";
+            try (PreparedStatement selectStatement = connection.prepareStatement(selectSql)) {
+                selectStatement.setString(1, currentGroupName);
+                ResultSet resultSet = selectStatement.executeQuery();
+                if (resultSet.next()) {
+                    String imagePath = resultSet.getString("ruta_foto");
+                    if (imagePath != null && !imagePath.isEmpty()) {
+                        profileImagePath = imagePath;
+                        repaint();
+                    }
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Error al acceder a la base de datos");
+        }
+    }
+
+
     public MyGroupWindow(MenuWindow menuWindow, int userId, String currentGroupName) {
         this.currentUserId = userId;
         this.currentGroupName = currentGroupName;
@@ -46,10 +70,13 @@ public class MyGroupWindow extends JFrame {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                ImageIcon backgroundImage = new ImageIcon("Images/imagenFiesta.png");
-                g.drawImage(backgroundImage.getImage(), 0, 0, getWidth(), getHeight(), this);
+                if (profileImagePath != null && !profileImagePath.isEmpty()) {
+                    ImageIcon backgroundImage = new ImageIcon(profileImagePath);
+                    g.drawImage(backgroundImage.getImage(), 0, 0, getWidth(), getHeight(), this);
+                }
             }
         };
+
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
         setContentPane(contentPane);
 
@@ -69,8 +96,6 @@ public class MyGroupWindow extends JFrame {
         buttonPanel.add(Box.createVerticalStrut(20));
         buttonPanel.add(participantsButton);
         buttonPanel.add(photoButton);
-        // buttonPanel.add(yourActivitiesButton); De momento van a estar en actividades
-        // buttonPanel.add(matchActivitiesButton); De momento van a estar en actividades
         buttonPanel.add(exitGroupButton);
         buttonPanel.add(deleteAccountButton);
         buttonPanel.add(deleteGroupActivitiesButton);
@@ -97,7 +122,61 @@ public class MyGroupWindow extends JFrame {
 
                     // Mostrar la imagen en la parte superior derecha de la ventana
                     showProfileImage(profileImagePath);
+
+                    try (Connection connection = getConnection()) {
+                        // Comprobar si el grupo ya tiene una entrada en la tabla foto
+                        boolean groupExists = false;
+                        String checkSql = "SELECT COUNT(*) FROM foto WHERE nombre_grupo = ?";
+                        try (PreparedStatement checkStatement = connection.prepareStatement(checkSql)) {
+                            checkStatement.setString(1, currentGroupName);
+                            ResultSet resultSet = checkStatement.executeQuery();
+                            if (resultSet.next()) {
+                                int count = resultSet.getInt(1);
+                                groupExists = count > 0;
+                            }
+                        }
+
+                        if (groupExists) {
+                            // Si el grupo ya existe en la tabla foto, actualizar la ruta de la foto
+                            String updateSql = "UPDATE foto SET ruta_foto = ? WHERE nombre_grupo = ?";
+                            try (PreparedStatement updateStatement = connection.prepareStatement(updateSql)) {
+                                updateStatement.setString(1, profileImagePath);
+                                updateStatement.setString(2, currentGroupName);
+                                int rowsAffected = updateStatement.executeUpdate();
+                                if (rowsAffected > 0) {
+                                    JOptionPane.showMessageDialog(null, "Ruta de la foto actualizada exitosamente en la base de datos");
+                                } else {
+                                    JOptionPane.showMessageDialog(null, "Error al actualizar la ruta de la foto en la base de datos");
+                                }
+                            }
+                        } else {
+                            // Si el grupo no existe en la tabla foto, insertar una nueva fila
+                            String insertSql = "INSERT INTO foto (nombre_grupo, ruta_foto) VALUES (?, ?)";
+                            try (PreparedStatement insertStatement = connection.prepareStatement(insertSql)) {
+                                insertStatement.setString(1, currentGroupName);
+                                insertStatement.setString(2, profileImagePath);
+                                int rowsAffected = insertStatement.executeUpdate();
+                                if (rowsAffected > 0) {
+                                    JOptionPane.showMessageDialog(null, "Ruta de la foto guardada exitosamente en la base de datos");
+                                } else {
+                                    JOptionPane.showMessageDialog(null, "Error al guardar la ruta de la foto en la base de datos");
+                                }
+                            }
+                        }
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                        JOptionPane.showMessageDialog(null, "Error al acceder a la base de datos");
+                    }
                 }
+            }
+        });
+
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowOpened(WindowEvent e) {
+                // Cargar la foto de fondo al abrir la ventana
+                loadBackgroundPhoto();
             }
         });
 
@@ -168,7 +247,6 @@ public class MyGroupWindow extends JFrame {
                 }
             }
         });
-
 
 
         deleteAccountButton.addActionListener(new ActionListener() {
@@ -260,7 +338,6 @@ public class MyGroupWindow extends JFrame {
         buttonPanel.add(backButton);
 
 
-
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -271,7 +348,25 @@ public class MyGroupWindow extends JFrame {
 
 
 
+    private void setFotoBackground(String rutaFoto) {
+        // Establecer la foto como fondo del JPanel
+        contentPane.removeAll(); // Eliminar cualquier componente existente
+        contentPane.setLayout(new BorderLayout()); // Cambiar al diseño BorderLayout para establecer el fondo
+
+        ImageIcon backgroundImage = new ImageIcon(rutaFoto);
+        JLabel backgroundLabel = new JLabel(backgroundImage);
+        contentPane.add(backgroundLabel, BorderLayout.CENTER);
+
+        // Actualizar la visualización
+        revalidate();
+        repaint();
+    }
+
+
+
+
     private Connection getConnection() throws SQLException {
         return DriverManager.getConnection(URL, USERNAME, PASSWORD);
     }
 }
+
