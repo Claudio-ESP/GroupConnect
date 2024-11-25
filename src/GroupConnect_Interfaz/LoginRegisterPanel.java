@@ -1,4 +1,6 @@
-package GroupConnect_Logica;
+package GroupConnect_Interfaz;
+
+import GroupConnect_MySQL.DatabaseHandler;
 
 import javax.swing.*;
 import java.awt.*;

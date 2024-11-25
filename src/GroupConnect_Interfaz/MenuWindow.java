@@ -1,4 +1,9 @@
-package GroupConnect_Logica;
+package GroupConnect_Interfaz;
+
+import GroupConnect_Logica.ActividadHandler;
+import GroupConnect_Logica.CrearGrupoAction;
+import GroupConnect_MySQL.DatabaseHandler;
+import GroupConnect_Logica.UnirseGrupoAction;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,9 +17,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static GroupConnect_Logica.DatabaseHandler.getConnection;
+import static GroupConnect_MySQL.DatabaseHandler.getConnection;
 
-public class MenuWindow extends JFrame {
+public class MenuWindow extends JFrame  {
 
     private int currentUserId; // Campo para almacenar el userId actual
     private static String currentGroupName;
@@ -172,25 +177,4 @@ public class MenuWindow extends JFrame {
         }
     }
 
-
-    // Se puede eliminar, de momento lo dejo para que si lo ejecutamos diga credenciales inválidas
-    public static void main(String[] args) {
-        try {
-            // Intentamos hacer login con las credenciales
-            String email = "correo@ejemplo.com"; // Reemplaza con el email correcto
-            String password = "contraseña"; // Reemplaza con la contraseña correcta
-            int userId = DatabaseHandler.checkLogin(email, password);
-
-            if (userId != -1) { // Si las credenciales son válidas, mostramos el menú
-                SwingUtilities.invokeLater(() -> {
-                    MenuWindow menuWindow = new MenuWindow(userId);
-                    menuWindow.setVisible(true);
-                });
-            } else {
-                System.out.println("Credenciales inválidas");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
 }

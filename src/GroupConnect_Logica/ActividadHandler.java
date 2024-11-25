@@ -1,5 +1,7 @@
 package GroupConnect_Logica;
 
+import GroupConnect_Interfaz.MenuWindow;
+
 import javax.swing.*;
 import java.sql.*;
 import java.util.ArrayList;
@@ -148,12 +150,16 @@ public class ActividadHandler {
                 try (ResultSet resultSet = statement.executeQuery()) {
                     if (resultSet.next()) {
                         nombreGrupo = resultSet.getString("nombre_grupo");
+                    } else {
+                        // No se encontró ninguna actividad con el idActividad proporcionado
+                        throw new SQLException("No se encontró ninguna actividad con el ID proporcionado: " + idActividad);
                     }
                 }
             }
         }
         return nombreGrupo;
     }
+
 
 
     // Métodos auxiliares para obtener el ID de una actividad por su nombre

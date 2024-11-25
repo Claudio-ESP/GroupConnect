@@ -1,4 +1,6 @@
-package GroupConnect_Logica;
+package GroupConnect_Interfaz;
+
+import GroupConnect_Logica.ActividadHandler;
 
 import javax.swing.*;
 import java.awt.*;
@@ -203,10 +205,6 @@ public class ActividadesPanel extends JPanel {
         add(actividadesConMatchButton);
 
 
-
-
-
-
         JButton actividadesAceptadasButton = new JButton("Actividades Aceptadas");
         actividadesAceptadasButton.addActionListener(new ActionListener() {
             @Override
@@ -237,10 +235,6 @@ public class ActividadesPanel extends JPanel {
             }
         });
         add(backButton);
-
-
-
-
 
 
     }

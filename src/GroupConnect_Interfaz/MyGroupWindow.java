@@ -1,5 +1,7 @@
 
-package GroupConnect_Logica;
+package GroupConnect_Interfaz;
+
+import GroupConnect_Logica.ActividadHandler;
 
 import javax.swing.*;
 import java.awt.*;
@@ -345,24 +347,6 @@ public class MyGroupWindow extends JFrame {
             }
         });
     }
-
-
-
-    private void setFotoBackground(String rutaFoto) {
-        // Establecer la foto como fondo del JPanel
-        contentPane.removeAll(); // Eliminar cualquier componente existente
-        contentPane.setLayout(new BorderLayout()); // Cambiar al diseño BorderLayout para establecer el fondo
-
-        ImageIcon backgroundImage = new ImageIcon(rutaFoto);
-        JLabel backgroundLabel = new JLabel(backgroundImage);
-        contentPane.add(backgroundLabel, BorderLayout.CENTER);
-
-        // Actualizar la visualización
-        revalidate();
-        repaint();
-    }
-
-
 
 
     private Connection getConnection() throws SQLException {

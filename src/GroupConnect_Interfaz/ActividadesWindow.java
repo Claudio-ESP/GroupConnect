@@ -1,4 +1,6 @@
-package GroupConnect_Logica;
+package GroupConnect_Interfaz;
+
+import GroupConnect_Logica.ActividadHandler;
 
 import javax.swing.*;
 
@@ -20,14 +22,5 @@ public class ActividadesWindow extends JFrame {
         setLocationRelativeTo(null);
         setVisible(true);
     }
-/*
-    public static void main(String[] args) {
-        // Para probar la ventana de actividades
-        SwingUtilities.invokeLater(() -> {
-            int currentUserId = 123; // Reemplaza 123 con el ID del usuario actual
-            ActividadHandler actividadHandler = new ActividadHandler(currentUserId);
-            new ActividadesWindow(actividadHandler);
-        });
-    }*/
 
 }

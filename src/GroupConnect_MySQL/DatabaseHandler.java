@@ -1,4 +1,4 @@
-package GroupConnect_Logica;
+package GroupConnect_MySQL;
 
 import java.sql.*;
 
@@ -38,24 +38,5 @@ public class DatabaseHandler {
         }
     }
 
-    public static void main(String[] args) {
-        try {
-            Connection conn = getConnection();
-            System.out.println("Conexión exitosa");
-
-            // Código para crear la tabla si no existe
-            String createTableQuery = "CREATE TABLE IF NOT EXISTS users (" +
-                    "id INT AUTO_INCREMENT PRIMARY KEY," +
-                    "email VARCHAR(100) UNIQUE," +
-                    "password VARCHAR(100)," +
-                    "name VARCHAR(100))";
-            Statement statement = conn.createStatement();
-            statement.executeUpdate(createTableQuery);
-
-            conn.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
 }
 
